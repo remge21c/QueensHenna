@@ -48,3 +48,18 @@ export async function updateCustomer(id: string, formData: any) {
   revalidatePath(`/customers/${id}`)
   return { success: true }
 }
+
+export async function searchCustomers(query: string) {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('customers')
+    .select('id, name, phone')
+    .or(`name.ilike.%${query}%,phone.ilike.%${query}%`)
+    .limit(10)
+
+  if (error) {
+    console.error('Error searching customers:', error)
+    return []
+  }
+  return data
+}

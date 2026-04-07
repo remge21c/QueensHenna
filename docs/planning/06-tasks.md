@@ -141,20 +141,33 @@ cd ../project-phase2-customers
 - 실시간 잔량 경고 필터링
 **산출물**: `app/inventory/page.tsx`
 
+### [x] Phase 3, T3.2: 염색약 구매/보충 등록 폼 구현 (RED-GREEN)
+**담당**: frontend-specialist
+**작업 내용**:
+- 고객별 염색약 구매 내역 등록
+- 기존 재고 합산 로직 (Upsert)
+**TDD 사이클**:
+1. **RED**: `tests/inventory/InventoryRegister.test.tsx` 작성
+2. **GREEN**: `app/inventory/register/page.tsx` 및 서버 액션 구현
+**산출물**: `app/inventory/register/page.tsx`, `app/inventory/actions.ts`
+
 ---
 
 ## M4: 예약 관리
-### [] Phase 4, T4.1: 예약 캘린더 UI 이식 및 관리 (RED-GREEN)
+### [x] Phase 4, T4.1: 예약 캘린더 UI 이식 및 관리 (RED-GREEN)
 **담당**: frontend-specialist
 **디자인 소스**: `designs/reservations.html`
 **작업 내용**:
-- 예약 현황 캘린더/리스트 뷰 구현
-- 신규 예약 등록 및 상태 변경 (예약완료 -> 방문완료)
-**산출물**: `app/reservations/page.tsx`
+- [x] 예약 현황 캘린더/리스트 뷰 UI 구현 (`ReservationTimeline`)
+- [x] 예약 현황 조회 테스트 코드 작성 및 통과
+- [x] Supabase 예약 데이터 연동 (`getReservationsByDate`)
+**산출물**: `app/reservations/page.tsx`, `components/reservations/ReservationTimeline.tsx`, `app/reservations/actions.ts`
 
----
-
-## M5: 시술 및 자동 정산
+### [x] Phase 4, T4.2: 예약 등록 폼 구현 (RED-GREEN)
+- [x] 예약 등록 폼 UI 개발 (`ReservationForm`)
+- [x] 고객 검색 연동 (`searchCustomers`)
+- [x] 예약 등록 서버 액션 구현 (`createReservation`)
+**산출물**: `components/reservations/ReservationForm.tsx`
 
 ### [] Phase 5, T5.1: 시술 등록 UI 이식 및 RPC 연동 (RED-GREEN)
 **담당**: frontend-specialist / database-specialist
