@@ -1,4 +1,4 @@
-# 퀸즈헤나 고객관리 웹앱 PRD v1
+# 퀸즈헤나 고객관리 웹앱 PRD v2
 
 ## 1. 프로젝트 개요
 퀸즈헤나 염색 전문점의 원장님이 고객, 예약, 시술, 염색약 잔량, 매출을 통합 관리할 수 있는 내부용 웹앱을 만든다.
@@ -69,7 +69,7 @@
 
 ### 6.1 로그인
 - 사용자 ID/비밀번호 로그인
-- 역할 기반 접근 제어
+- 역할 기반 접근 제어 (Supabase Auth + RLS)
 - 사용자 2명 계정 운영
   - 원장님
   - 앱관리자
@@ -88,9 +88,9 @@
 - 이름
 - 전화번호
 - 생년월일
-- 최근 방문일(시술기록 기반 자동 반영)
+- 최근 방문일 (시술기록 기반 자동 반영)
 - 메모
-- 프로필 사진
+- 프로필 사진 (Supabase Storage 저장)
 
 #### 고객 상세
 - 기본 레시피
@@ -132,7 +132,7 @@
 - 기본 금액
 - 추가 금액
 - 총 금액 자동 계산
-- 결제수단(계좌이체/현금/카드)
+- 결제수단 (계좌이체 / 현금 / 카드)
 - 메모
 
 #### 사용 염색약 입력
@@ -191,7 +191,7 @@
 #### 발송 방식
 - 자동 발송 설정 가능
 - 수동 발송 가능
-- 문자 서비스 업체는 추후 결정
+- 문자 서비스 업체는 추후 결정 (Supabase Edge Functions로 연동 예정)
 
 ### 6.9 매출통계
 - 일 매출
@@ -210,107 +210,107 @@
 - 자동 문자 ON/OFF
 
 ### 6.11 백업관리
-- 수동 백업
-- 자동 백업
+- 수동 백업: 전체 데이터를 JSON 형식으로 내보내기
+- 자동 백업: 주기적으로 JSON 파일 생성 및 Supabase Storage 저장
 - 백업 파일 목록 조회
-- 복원 기능
+- 복원: 백업 JSON 파일을 업로드하여 데이터 복원
 - 마지막 백업 시각 표시
+
+> **구현 방식:** Supabase 플랫폼 백업 기능 대신, 앱 레벨에서 전체 데이터를 JSON으로 내보내고 가져오는 방식으로 구현한다. 별도 인프라 의존 없이 단순하게 유지한다.
 
 ---
 
-## 7. 데이터 구조 초안
+## 7. 데이터 구조
 
-### 사용자
-- user_id
+### users (Supabase Auth 연동)
+- id (uuid, Supabase Auth user id)
 - name
-- role (owner/admin)
-- login_id
-- password_hash
+- role (owner / admin)
 - is_active
 - created_at
 
-### 고객
-- customer_id
+### customers
+- id (uuid)
 - name
 - phone
 - birth_date
 - memo
-- profile_image_path
+- profile_image_path (Supabase Storage 경로)
 - created_at
 - updated_at
 
-### 예약
-- reservation_id
-- customer_id
+### reservations
+- id (uuid)
+- customer_id (→ customers)
 - reserved_at
-- status
+- status (예약완료 / 방문완료 / 취소 / 노쇼 / 대기)
 - memo
 - created_at
 - updated_at
 
-### 시술종류
-- treatment_type_id
+### treatment_types
+- id (uuid)
 - name
 - base_price
 - is_active
 
-### 시술기록
-- treatment_id
-- customer_id
-- treatment_type_id
+### treatments
+- id (uuid)
+- customer_id (→ customers)
+- treatment_type_id (→ treatment_types)
 - treated_at
 - base_price
 - extra_price
 - total_price
-- payment_method
+- payment_method (계좌이체 / 현금 / 카드)
 - memo
 - created_at
 
-### 염색약종류
-- dye_id
+### dye_types
+- id (uuid)
 - name
 - total_capacity
-- default_unit_id
+- default_unit_id (→ units)
 - memo
 - is_active
 
-### 단위
-- unit_id
+### units
+- id (uuid)
 - name
 - is_active
 
-### 고객기본레시피
-- customer_recipe_id
-- customer_id
-- dye_id
+### customer_recipes
+- id (uuid)
+- customer_id (→ customers)
+- dye_id (→ dye_types)
 - default_use_amount
-- unit_id
+- unit_id (→ units)
 - memo
 
-### 고객보유염색약
-- customer_dye_stock_id
-- customer_id
-- dye_id
+### customer_dye_stocks
+- id (uuid)
+- customer_id (→ customers)
+- dye_id (→ dye_types)
 - purchased_amount
 - current_amount
-- unit_id
+- unit_id (→ units)
 - purchased_at
-- status
+- status (정상 / 주의 / 경고 / 소진)
 
-### 시술사용염색약
-- treatment_dye_usage_id
-- treatment_id
-- customer_dye_stock_id
-- dye_id
+### treatment_dye_usages
+- id (uuid)
+- treatment_id (→ treatments)
+- customer_dye_stock_id (→ customer_dye_stocks)
+- dye_id (→ dye_types)
 - used_amount
-- unit_id
+- unit_id (→ units)
 
-### 백업이력
-- backup_id
-- backup_type
-- file_path
+### backup_history
+- id (uuid)
+- backup_type (manual / auto)
+- file_path (Supabase Storage 경로)
 - created_at
-- created_by
+- created_by (→ users)
 - status
 
 ---
@@ -318,10 +318,14 @@
 ## 8. 핵심 계산 로직
 
 ### 총금액
+```
 총금액 = 기본 금액 + 추가 금액
+```
 
 ### 남은 예상 횟수
+```
 남은횟수 = 현재잔량 / 고객 기본 1회 사용량
+```
 
 ### 경고 기준
 - 남은횟수 > 2: 정상
@@ -334,64 +338,34 @@
 ## 9. 화면 구성
 
 ### 화면 1. 로그인
-- 로그인ID
-- 비밀번호
-- 로그인 버튼
+- 로그인ID / 비밀번호 / 로그인 버튼
 
 ### 화면 2. 대시보드
-- 오늘 예약
-- 오늘 매출
-- 월 매출
-- 부족 고객
-- 최근 시술
+- 오늘 예약 / 오늘 매출 / 월 매출 / 부족 고객 / 최근 시술
 
 ### 화면 3. 고객 목록
-- 검색
-- 고객 리스트
-- 최근 방문일
-- 경고 배지
+- 검색 / 고객 리스트 / 최근 방문일 / 경고 배지
 
 ### 화면 4. 고객 상세
-- 기본 정보
-- 프로필 사진
-- 기본 레시피
-- 보유 염색약
-- 시술 내역
-- 예약 내역
-- 매출
+- 기본 정보 / 프로필 사진 / 기본 레시피 / 보유 염색약 / 시술 내역 / 예약 내역 / 매출
 
 ### 화면 5. 예약관리
-- 날짜별 목록
-- 시간별 목록
-- 겹침 경고 표시
-- 예약 등록/수정
+- 날짜별 목록 / 시간별 목록 / 겹침 경고 표시 / 예약 등록·수정
 
 ### 화면 6. 시술 등록
-- 고객 선택
-- 시술 종류
-- 금액 입력
-- 사용 염색약 입력
-- 저장
+- 고객 선택 / 시술 종류 / 금액 입력 / 사용 염색약 입력 / 저장
 
 ### 화면 7. 염색약관리
-- 염색약 종류 관리
-- 고객별 잔량 조회
+- 염색약 종류 관리 / 고객별 잔량 조회
 
 ### 화면 8. 매출통계
-- 기간 필터
-- 통계 카드
-- 고객별 매출 목록
+- 기간 필터 / 통계 카드 / 고객별 매출 목록
 
 ### 화면 9. 설정
-- 시술 종류
-- 단위
-- 문자 템플릿
-- 자동 발송 설정
+- 시술 종류 / 단위 / 문자 템플릿 / 자동 발송 설정
 
 ### 화면 10. 백업관리
-- 백업 실행
-- 백업 목록
-- 복원 실행
+- 백업 실행 / 백업 목록 / 복원 실행
 
 ---
 
@@ -407,7 +381,7 @@
 - 시술 종류/금액 관리
 - 결제수단 관리
 - 프로필 사진 업로드
-- 기본 백업
+- 기본 백업 (JSON 내보내기)
 
 ### 2차 개발
 - 문자 발송 연동
@@ -423,22 +397,38 @@
 
 ---
 
-## 11. 기술 방향 초안
-- 웹앱
-- 서버 저장 방식 사진 업로드
-- 정기 백업 지원
-- SMS API는 추후 선정 후 연동
+## 11. 기술 스택
+
+| 레이어 | 기술 |
+|---|---|
+| 프론트엔드 | Next.js (React) |
+| DB | Supabase (PostgreSQL) |
+| DB 클라이언트 | supabase-js (Prisma 미사용) |
+| 인증 | Supabase Auth |
+| 권한 제어 | Supabase RLS (Row Level Security) |
+| 파일 저장 | Supabase Storage |
+| 서버 로직 | Supabase Edge Functions |
+| SMS 연동 | Edge Functions → SMS API (추후 선정) |
+| 타입 생성 | supabase gen types typescript |
+
+### supabase-js 사용 원칙
+- ORM(Prisma) 미사용
+- 모든 DB 쿼리는 supabase-js 클라이언트로 직접 처리
+- 타입은 Supabase CLI로 자동 생성하여 사용
+- 복잡한 집계 쿼리는 Supabase에서 View 또는 RPC(함수)로 처리
 
 ---
 
 ## 12. 결정 완료 사항
 - 웹앱으로 개발
-- 사용자 2명(원장님, 앱관리자)
-- 백업 기능 필요
-- 사진은 서버 저장
-- 문자 서비스는 추후 결정
-- 예약 시간은 10분 단위
+- 사용자 2명 (원장님, 앱관리자)
+- DB: Supabase (PostgreSQL)
+- DB 클라이언트: supabase-js (Prisma 미사용)
+- 인증: Supabase Auth
+- 파일 저장: Supabase Storage
+- 백업: 앱 레벨 JSON 내보내기/가져오기 방식
+- 문자 서비스: 추후 결정 후 Edge Functions로 연동
+- 예약 시간: 10분 단위
 - 겹치는 예약 허용, 경고만 표시
 - 고객별 기본 레시피 지원
 - 염색약은 고객이 한 번 구매하고 여러 번 나눠 쓰는 구조
-
