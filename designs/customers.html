@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>퀸즈헤나 CRM - 고객 관리</title>
+    <!-- 폰트 적용 (Pretendard) -->
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <!-- 아이콘 (Phosphor Icons) -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <style>
+        :root {
+            var(--primary): #5A7163;
+            var(--primary-light): #8BA895;
+            var(--secondary): #D4B08C;
+            var(--background): #F9F8F6;
+            var(--surface): #FFFFFF;
+            var(--text-main): #333333;
+            var(--text-muted): #777777;
+            var(--danger): #E07A5F;
+            var(--warning): #F2CC8F;
+            var(--border): #EAE6DF;
+            
+            --primary: #5A7163;
+            --background: #F9F8F6;
+            --surface: #FFFFFF;
+            --text-main: #333333;
+            --text-muted: #777777;
+            --border: #EAE6DF;
+            --danger: #E07A5F;
+            
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+            --transition: all 0.3s ease;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Pretendard', sans-serif; }
+        body { background-color: var(--background); color: var(--text-main); display: flex; min-height: 100vh; }
+
+        .sidebar { width: 250px; background: var(--surface); border-right: 1px solid var(--border); padding: 24px; display: flex; flex-direction: column; gap: 32px; }
+        .logo { font-size: 24px; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 12px; letter-spacing: -0.5px; white-space: nowrap; }
+        .nav-menu { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+        .nav-item { padding: 14px 16px; border-radius: var(--radius-md); color: var(--text-muted); text-decoration: none; display: flex; align-items: center; gap: 12px; font-weight: 500; transition: var(--transition); }
+        .nav-item.active { background-color: var(--primary); color: white; box-shadow: 0 4px 12px rgba(90, 113, 99, 0.3); }
+        .nav-item:not(.active):hover { background-color: var(--background); color: var(--primary); transform: translateX(4px); }
+
+        .main-content { flex: 1; padding: 40px; overflow-y: auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
+        h1 { font-size: 28px; font-weight: 700; color: var(--text-main); }
+
+        .btn-primary { background: var(--primary); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 15px; transition: var(--transition); }
+        .btn-primary:hover { background: #4a5c51; }
+
+        .card { background: var(--surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); border: 1px solid var(--border); padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+
+        .search-bar { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 8px; }
+        .search-input-wrapper { flex: 1; max-width: 400px; position: relative; }
+        .search-input-wrapper i { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 18px; }
+        .search-input { width: 100%; padding: 12px 16px 12px 42px; border: 1px solid var(--border); border-radius: 8px; font-size: 15px; outline: none; transition: border-color 0.2s; }
+        .search-input:focus { border-color: var(--primary); }
+
+        .filter-buttons { display: flex; gap: 12px; }
+        .filter-btn { padding: 8px 16px; background: var(--background); border: 1px solid var(--border); border-radius: 20px; font-size: 14px; font-weight: 500; color: var(--text-muted); cursor: pointer; }
+        .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table th { text-align: left; padding: 12px 16px; border-bottom: 2px solid var(--border); color: var(--text-muted); font-size: 13px; font-weight: 500; }
+        .data-table td { padding: 16px; border-bottom: 1px solid var(--border); color: var(--text-main); font-size: 14px; vertical-align: middle; cursor: pointer; }
+        .data-table tbody tr:hover td { background-color: #fcfcfc; }
+        
+        .avatar { width: 36px; height: 36px; border-radius: 50%; background: #D4B08C; color: white; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 12px; vertical-align: middle;}
+
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-block; }
+        .badge.warning { background: rgba(224, 122, 95, 0.1); color: var(--danger); }
+        .badge.normal { background: rgba(90, 113, 99, 0.1); color: var(--primary); }
+    
+        /* 모바일 반응형 추가 */
+        .mobile-header { display: none; padding: 16px 20px; background: var(--surface); border-bottom: 1px solid var(--border); justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 900; }
+        .mobile-header .logo { font-size: 20px; margin: 0; }
+        .menu-toggle { background: none; border: none; font-size: 24px; color: var(--text-main); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 998; opacity: 0; transition: opacity 0.3s; }
+        .sidebar-overlay.active { display: block; opacity: 1; }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .mobile-header { display: flex; }
+            .sidebar { position: fixed; top: 0; left: -280px; height: 100vh; z-index: 1000; width: 280px; box-shadow: var(--shadow-md); transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+            .sidebar.active { left: 0; }
+            .main-content { padding: 16px; overflow-x: hidden; }
+            
+            .dashboard-grid, .grid-layout, .grid, .kpi-section, .settings-container, .summary-grid { display: flex !important; flex-direction: column; gap: 16px; height: auto; }
+            .widget-main, .widget-side, .settings-nav { width: 100%; }
+            
+            .header { flex-direction: column; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+            .header .user-profile, .header select, .header .btn-primary { width: 100%; justify-content: center; }
+            .header-right { width: 100%; justify-content: stretch; overflow-x: auto; padding-bottom: 4px; }
+            .header-right .btn { flex-shrink: 0; }
+            
+            .search-bar { flex-direction: column; align-items: stretch; }
+            .search-input-wrapper { max-width: 100%; }
+            .filter-buttons { overflow-x: auto; padding-bottom: 8px; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+            
+            /* 카드 내부 테이블 스크롤 처리 */
+            .card { overflow-x: auto; padding: 16px; }
+            .card table { min-width: 500px; }
+            
+            .tabs { overflow-x: auto; white-space: nowrap; padding-bottom: 8px; }
+            .time-table th { min-width: 80px; }
+            .time-table td:nth-child(2) { min-width: 400px; }
+        }
+
+    </style>
+</head>
+<body>
+
+    
+
+    <!-- 모바일 타이틀 바 -->
+    <div class="mobile-header">
+        <div class="logo"><i class="ph-fill ph-plant"></i>Queens Henna</div>
+        <button class="menu-toggle" onclick="document.querySelector('.sidebar').classList.add('active'); document.querySelector('.sidebar-overlay').classList.add('active');"><i class="ph ph-list"></i></button>
+    </div>
+    
+    <!-- 모바일 사이드바 배경 -->
+    <div class="sidebar-overlay" onclick="document.querySelector('.sidebar').classList.remove('active'); document.querySelector('.sidebar-overlay').classList.remove('active');"></div>
+
+    <aside class="sidebar">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <div class="logo" style="margin: 0;"><i class="ph-fill ph-plant"></i>Queens Henna</div>
+            <button class="menu-toggle" style="display: none;" onclick="document.querySelector('.sidebar').classList.remove('active'); document.querySelector('.sidebar-overlay').classList.remove('active');" id="mobile-close-btn"><i class="ph ph-x"></i></button>
+        </div>
+        <style>@media (max-width: 768px) { #mobile-close-btn { display: block !important; } .sidebar .logo { font-size: 20px; } .sidebar { gap: 16px !important; } }</style>
+
+        <nav>
+            <ul class="nav-menu">
+                <li><a href="dashboard.html" class="nav-item"><i class="ph ph-squares-four"></i>대시보드</a></li>
+                <li><a href="customers.html" class="nav-item active"><i class="ph ph-users"></i>고객관리</a></li>
+                <li><a href="reservations.html" class="nav-item"><i class="ph ph-calendar-check"></i>예약관리</a></li>
+                <li><a href="treatment-register.html" class="nav-item"><i class="ph ph-clipboard-text"></i>시술기록</a></li>
+                <li><a href="inventory.html" class="nav-item"><i class="ph ph-drop"></i>염색약관리</a></li>
+                <li><a href="sms.html" class="nav-item"><i class="ph ph-chat-circle-text"></i>문자발송</a></li>
+                <li><a href="sales.html" class="nav-item"><i class="ph ph-chart-line-up"></i>매출통계</a></li>
+                <li><a href="settings.html" class="nav-item"><i class="ph ph-gear"></i>설정 및 백업</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="header">
+            <h1>고객 관리</h1>
+            <button class="btn-primary"><i class="ph ph-plus"></i> 신규 고객 등록</button>
+        </header>
+
+        <div class="card">
+            <div class="search-bar">
+                <div class="search-input-wrapper">
+                    <i class="ph ph-magnifying-glass"></i>
+                    <input type="text" class="search-input" placeholder="이름, 전화번호 검색...">
+                </div>
+                <div class="filter-buttons">
+                    <button class="filter-btn active">전체조회</button>
+                    <button class="filter-btn">재방문 필요</button>
+                    <button class="filter-btn">염색약 부족</button>
+                </div>
+            </div>
+
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>고객명</th>
+                        <th>연락처</th>
+                        <th>최근 방문일</th>
+                        <th>누적 방문</th>
+                        <th>보유 염색약 (잔여)</th>
+                        <th>상태</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr onclick="location.href='customer-detail.html'">
+                        <td><div class="avatar" style="background:#5A7163;">김</div><strong style="font-size:15px">김미영</strong></td>
+                        <td>010-1234-5678</td>
+                        <td>오늘 (2026.04.07)</td>
+                        <td>12회</td>
+                        <td>내츄럴 브라운 (3.5회)</td>
+                        <td><span class="badge normal">정상</span></td>
+                    </tr>
+                    <tr onclick="location.href='customer-detail.html'">
+                        <td><div class="avatar">오</div><strong style="font-size:15px">오영희</strong></td>
+                        <td>010-9876-5432</td>
+                        <td>25일 전 (2026.03.13)</td>
+                        <td>8회</td>
+                        <td>라이트 브라운 <strong style="color:var(--danger)">(0.5회)</strong></td>
+                        <td><span class="badge warning">소진임박</span></td>
+                    </tr>
+                    <tr onclick="location.href='customer-detail.html'">
+                        <td><div class="avatar" style="background:#8BA895;">박</div><strong style="font-size:15px">박영선</strong></td>
+                        <td>010-5555-4444</td>
+                        <td><span style="color:var(--danger)">45일 전</span> (2026.02.21)</td>
+                        <td>3회</td>
+                        <td>레드 (2.0회)</td>
+                        <td><span class="badge warning">재방문요청</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+</body>
+</html>

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>퀸즈헤나 CRM - 설정 및 백업</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <style>
+        :root {
+            --primary: #5A7163; --background: #F9F8F6; --surface: #FFFFFF; 
+            --text-main: #333333; --text-muted: #777777; --border: #EAE6DF;
+            --radius-md: 12px; --radius-lg: 20px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Pretendard', sans-serif; }
+        body { background-color: var(--background); color: var(--text-main); display: flex; min-height: 100vh; }
+
+        .sidebar { width: 250px; background: var(--surface); border-right: 1px solid var(--border); padding: 24px; display: flex; flex-direction: column; gap: 32px; }
+        .logo { font-size: 24px; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 12px; letter-spacing: -0.5px; white-space: nowrap; }
+        .nav-menu { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+        .nav-item { padding: 14px 16px; border-radius: var(--radius-md); color: var(--text-muted); text-decoration: none; display: flex; align-items: center; gap: 12px; font-weight: 500; transition: var(--transition); }
+        .nav-item.active { background-color: var(--primary); color: white; box-shadow: 0 4px 12px rgba(90, 113, 99, 0.3); }
+        .nav-item:not(.active):hover { background-color: var(--background); color: var(--primary); transform: translateX(4px); }
+
+        .main-content { flex: 1; padding: 40px; overflow-y: auto; }
+        .header { margin-bottom: 32px; }
+        h1 { font-size: 28px; font-weight: 700; }
+
+        .settings-container { display: flex; gap: 40px; }
+        .settings-nav { width: 200px; display: flex; flex-direction: column; gap: 8px; }
+        .settings-nav-item { padding: 12px 16px; font-weight: 600; color: var(--text-muted); cursor: pointer; border-radius: 8px; }
+        .settings-nav-item.active { background: rgba(90, 113, 99, 0.1); color: var(--primary); }
+
+        .settings-panel { flex: 1; background: var(--surface); border-radius: var(--radius-lg); padding: 32px; border: 1px solid var(--border); }
+        .panel-title { font-size: 20px; font-weight: 700; margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 16px; }
+
+        .form-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--border); }
+        .form-row:last-child { border-bottom: none; }
+        .row-text strong { display: block; font-size: 15px; margin-bottom: 4px; }
+        .row-text span { font-size: 13px; color: var(--text-muted); }
+
+        .btn { padding: 8px 16px; border: 1px solid var(--border); background: white; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        .btn.primary { background: var(--primary); color: white; border: none; }
+        .btn.danger { background: #E07A5F; color: white; border: none; }
+    
+        /* 모바일 반응형 추가 */
+        .mobile-header { display: none; padding: 16px 20px; background: var(--surface); border-bottom: 1px solid var(--border); justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 900; }
+        .mobile-header .logo { font-size: 20px; margin: 0; }
+        .menu-toggle { background: none; border: none; font-size: 24px; color: var(--text-main); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 998; opacity: 0; transition: opacity 0.3s; }
+        .sidebar-overlay.active { display: block; opacity: 1; }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .mobile-header { display: flex; }
+            .sidebar { position: fixed; top: 0; left: -280px; height: 100vh; z-index: 1000; width: 280px; box-shadow: var(--shadow-md); transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+            .sidebar.active { left: 0; }
+            .main-content { padding: 16px; overflow-x: hidden; }
+            
+            .dashboard-grid, .grid-layout, .grid, .kpi-section, .settings-container, .summary-grid { display: flex !important; flex-direction: column; gap: 16px; height: auto; }
+            .widget-main, .widget-side, .settings-nav { width: 100%; }
+            
+            .header { flex-direction: column; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+            .header .user-profile, .header select, .header .btn-primary { width: 100%; justify-content: center; }
+            .header-right { width: 100%; justify-content: stretch; overflow-x: auto; padding-bottom: 4px; }
+            .header-right .btn { flex-shrink: 0; }
+            
+            .search-bar { flex-direction: column; align-items: stretch; }
+            .search-input-wrapper { max-width: 100%; }
+            .filter-buttons { overflow-x: auto; padding-bottom: 8px; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+            
+            /* 카드 내부 테이블 스크롤 처리 */
+            .card { overflow-x: auto; padding: 16px; }
+            .card table { min-width: 500px; }
+            
+            .tabs { overflow-x: auto; white-space: nowrap; padding-bottom: 8px; }
+            .time-table th { min-width: 80px; }
+            .time-table td:nth-child(2) { min-width: 400px; }
+        }
+
+    </style>
+</head>
+<body>
+
+    
+
+    <!-- 모바일 타이틀 바 -->
+    <div class="mobile-header">
+        <div class="logo"><i class="ph-fill ph-plant"></i>Queens Henna</div>
+        <button class="menu-toggle" onclick="document.querySelector('.sidebar').classList.add('active'); document.querySelector('.sidebar-overlay').classList.add('active');"><i class="ph ph-list"></i></button>
+    </div>
+    
+    <!-- 모바일 사이드바 배경 -->
+    <div class="sidebar-overlay" onclick="document.querySelector('.sidebar').classList.remove('active'); document.querySelector('.sidebar-overlay').classList.remove('active');"></div>
+
+    <aside class="sidebar">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <div class="logo" style="margin: 0;"><i class="ph-fill ph-plant"></i>Queens Henna</div>
+            <button class="menu-toggle" style="display: none;" onclick="document.querySelector('.sidebar').classList.remove('active'); document.querySelector('.sidebar-overlay').classList.remove('active');" id="mobile-close-btn"><i class="ph ph-x"></i></button>
+        </div>
+        <style>@media (max-width: 768px) { #mobile-close-btn { display: block !important; } .sidebar .logo { font-size: 20px; } .sidebar { gap: 16px !important; } }</style>
+
+        <nav>
+            <ul class="nav-menu">
+                <li><a href="dashboard.html" class="nav-item"><i class="ph ph-squares-four"></i>대시보드</a></li>
+                <li><a href="customers.html" class="nav-item"><i class="ph ph-users"></i>고객관리</a></li>
+                <li><a href="reservations.html" class="nav-item"><i class="ph ph-calendar-check"></i>예약관리</a></li>
+                <li><a href="treatment-register.html" class="nav-item"><i class="ph ph-clipboard-text"></i>시술기록</a></li>
+                <li><a href="inventory.html" class="nav-item"><i class="ph ph-drop"></i>염색약관리</a></li>
+                <li><a href="sms.html" class="nav-item"><i class="ph ph-chat-circle-text"></i>문자발송</a></li>
+                <li><a href="sales.html" class="nav-item"><i class="ph ph-chart-line-up"></i>매출통계</a></li>
+                <li><a href="settings.html" class="nav-item active"><i class="ph ph-gear"></i>설정 및 백업</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="header">
+            <h1>환경 설정</h1>
+        </header>
+
+        <div class="settings-container">
+            <div class="settings-nav">
+                <div class="settings-nav-item active">시스템 설정</div>
+                <div class="settings-nav-item">시술 단가 마스터</div>
+                <div class="settings-nav-item">문자 템플릿 설정</div>
+                <div class="settings-nav-item">데이터 백업/복원</div>
+            </div>
+
+            <div class="settings-panel">
+                <div class="panel-title">데이터 백업 및 복원</div>
+                
+                <div class="form-row">
+                    <div class="row-text">
+                        <strong>시스템 수동 백업</strong>
+                        <span>현재까지의 고객, 예약, 시술, 염색약 모든 데이터를 파일로 저장합니다.</span>
+                    </div>
+                    <button class="btn primary">지금 백업하기</button>
+                </div>
+
+                <div class="form-row">
+                    <div class="row-text">
+                        <strong>데이터 복원</strong>
+                        <span>기존에 백업한 파일(.json)을 업로드하여 시스템을 복원합니다.</span>
+                    </div>
+                    <button class="btn">복원 파일 선택</button>
+                </div>
+
+                <div class="form-row">
+                    <div class="row-text">
+                        <strong>최근 백업 내역</strong>
+                        <span>마지막 백업: 2026. 04. 01 02:00 (자동 백업)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

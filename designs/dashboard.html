@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>퀸즈헤나 CRM - 대시보드</title>
+    <!-- 폰트 적용 (Pretendard) -->
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <!-- 아이콘 (Phosphor Icons) -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <style>
+        :root {
+            /* 컬러 팔레트 */
+            --primary: #5A7163;      /* 고급스러운 올리브 그린 (헤나 연상) */
+            --primary-light: #8BA895;
+            --secondary: #D4B08C;    /* 우아한 베이지/골드 */
+            --background: #F9F8F6;   /* 따뜻한 오프화이트 배경 */
+            --surface: #FFFFFF;
+            --text-main: #333333;
+            --text-muted: #777777;
+            --danger: #E07A5F;
+            --warning: #F2CC8F;
+            --border: #EAE6DF;
+            
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+            --shadow-md: 0 8px 24px rgba(0,0,0,0.06);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* 사이드바 가이드용 (간단히 처리) */
+        .sidebar { width: 250px; background: var(--surface); border-right: 1px solid var(--border); padding: 24px; display: flex; flex-direction: column; gap: 32px; }
+        .logo { font-size: 24px; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 12px; letter-spacing: -0.5px; white-space: nowrap; }
+        .nav-menu { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+        .nav-item { padding: 14px 16px; border-radius: var(--radius-md); color: var(--text-muted); text-decoration: none; display: flex; align-items: center; gap: 12px; font-weight: 500; transition: var(--transition); }
+        .nav-item.active { background-color: var(--primary); color: white; box-shadow: 0 4px 12px rgba(90, 113, 99, 0.3); }
+        .nav-item:not(.active):hover { background-color: var(--background); color: var(--primary); transform: translateX(4px); }
+
+        .main-content {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--secondary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        /* 대시보드 그리드 레이아웃 */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 24px;
+        }
+
+        /* KPI 카드들 */
+        .kpi-section {
+            grid-column: span 12;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+        }
+
+        .kpi-card {
+            background: var(--surface);
+            padding: 24px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            border: 1px solid var(--border);
+            transition: var(--transition);
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .kpi-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--text-muted);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .kpi-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .kpi-icon.primary { background: rgba(90, 113, 99, 0.1); color: var(--primary); }
+        .kpi-icon.secondary { background: rgba(212, 176, 140, 0.2); color: #B08D6A; }
+
+        .kpi-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        /* 메인 위젯 영역 */
+        .widget-main {
+            grid-column: span 8;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* 사이드 위젯 영역 */
+        .widget-side {
+            grid-column: span 4;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-action {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .card-action:hover {
+            color: var(--primary-light);
+        }
+
+        /* 테이블 스타일 */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 12px 16px;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .data-table td {
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-main);
+            font-size: 14px;
+            vertical-align: middle;
+        }
+
+        .data-table tr:hover td {
+            background-color: rgba(0,0,0,0.01);
+        }
+
+        /* 배지 스타일 */
+        .badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .badge.completed { background: rgba(90, 113, 99, 0.1); color: var(--primary); }
+        .badge.waiting { background: rgba(212, 176, 140, 0.2); color: #B08D6A; }
+        .badge.warning { background: rgba(224, 122, 95, 0.1); color: var(--danger); }
+        .badge.alert { background: rgba(242, 204, 143, 0.2); color: #D4A017; }
+
+        /* 리스트 아이템 (사이드 위젯용) */
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .list-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .list-user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .user-meta {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* 아이콘 액션 버튼 */
+        .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+            background: white;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-icon:hover {
+            color: var(--primary);
+            border-color: var(--primary);
+            background: rgba(90, 113, 99, 0.05);
+        }
+        
+        .text-danger {
+            color: var(--danger);
+            font-weight: bold;
+        }
+
+    
+        /* 모바일 반응형 추가 */
+        .mobile-header { display: none; padding: 16px 20px; background: var(--surface); border-bottom: 1px solid var(--border); justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 900; }
+        .mobile-header .logo { font-size: 20px; margin: 0; }
+        .menu-toggle { background: none; border: none; font-size: 24px; color: var(--text-main); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 998; opacity: 0; transition: opacity 0.3s; }
+        .sidebar-overlay.active { display: block; opacity: 1; }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .mobile-header { display: flex; }
+            .sidebar { position: fixed; top: 0; left: -280px; height: 100vh; z-index: 1000; width: 280px; box-shadow: var(--shadow-md); transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+            .sidebar.active { left: 0; }
+            .main-content { padding: 16px; overflow-x: hidden; }
+            
+            .dashboard-grid, .grid-layout, .grid, .kpi-section, .settings-container, .summary-grid { display: flex !important; flex-direction: column; gap: 16px; height: auto; }
+            .widget-main, .widget-side, .settings-nav { width: 100%; }
+            
+            .header { flex-direction: column; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+            .header .user-profile, .header select, .header .btn-primary { width: 100%; justify-content: center; }
+            .header-right { width: 100%; justify-content: stretch; overflow-x: auto; padding-bottom: 4px; }
+            .header-right .btn { flex-shrink: 0; }
+            
+            .search-bar { flex-direction: column; align-items: stretch; }
+            .search-input-wrapper { max-width: 100%; }
+            .filter-buttons { overflow-x: auto; padding-bottom: 8px; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+            
+            /* 카드 내부 테이블 스크롤 처리 */
+            .card { overflow-x: auto; padding: 16px; }
+            .card table { min-width: 500px; }
+            
+            .tabs { overflow-x: auto; white-space: nowrap; padding-bottom: 8px; }
+            .time-table th { min-width: 80px; }
+            .time-table td:nth-child(2) { min-width: 400px; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- 사이드바 -->
+    
+
+    <!-- 모바일 타이틀 바 -->
+    <div class="mobile-header">
+        <div class="logo"><i class="ph-fill ph-plant"></i>Queens Henna</div>
+        <button class="menu-toggle" onclick="document.querySelector('.sidebar').classList.add('active'); document.querySelector('.sidebar-overlay').classList.add('active');"><i class="ph ph-list"></i></button>
+    </div>
+    
+    <!-- 모바일 사이드바 배경 -->
+    <div class="sidebar-overlay" onclick="document.querySelector('.sidebar').classList.remove('active'); document.querySelector('.sidebar-overlay').classList.remove('active');"></div>
+
+    <aside class="sidebar">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <div class="logo" style="margin: 0;"><i class="ph-fill ph-plant"></i>Queens Henna</div>
+            <button class="menu-toggle" style="display: none;" onclick="document.querySelector('.sidebar').classList.remove('active'); document.querySelector('.sidebar-overlay').classList.remove('active');" id="mobile-close-btn"><i class="ph ph-x"></i></button>
+        </div>
+        <style>@media (max-width: 768px) { #mobile-close-btn { display: block !important; } .sidebar .logo { font-size: 20px; } .sidebar { gap: 16px !important; } }</style>
+
+        <nav>
+            <ul class="nav-menu">
+                <li><a href="dashboard.html" class="nav-item active"><i class="ph ph-squares-four"></i>대시보드</a></li>
+                <li><a href="customers.html" class="nav-item"><i class="ph ph-users"></i>고객관리</a></li>
+                <li><a href="reservations.html" class="nav-item"><i class="ph ph-calendar-check"></i>예약관리</a></li>
+                <li><a href="treatment-register.html" class="nav-item"><i class="ph ph-clipboard-text"></i>시술기록</a></li>
+                <li><a href="inventory.html" class="nav-item"><i class="ph ph-drop"></i>염색약관리</a></li>
+                <li><a href="sms.html" class="nav-item"><i class="ph ph-chat-circle-text"></i>문자발송</a></li>
+                <li><a href="sales.html" class="nav-item"><i class="ph ph-chart-line-up"></i>매출통계</a></li>
+                <li><a href="settings.html" class="nav-item"><i class="ph ph-gear"></i>설정 및 백업</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="main-content">
+        <header class="header">
+            <h1>대시보드</h1>
+            <div class="user-profile">
+                <div style="text-align: right;">
+                    <div style="font-weight: 600; font-size: 15px;">이원장</div>
+                    <div style="font-size: 12px; color: var(--text-muted);">원장님 계정</div>
+                </div>
+                <div class="avatar">원</div>
+            </div>
+        </header>
+
+        <div class="dashboard-grid">
+            
+            <!-- 상단 요약 (KPI) -->
+            <section class="kpi-section">
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        오늘의 예약
+                        <div class="kpi-icon primary"><i class="ph ph-calendar-star"></i></div>
+                    </div>
+                    <div class="kpi-value">8명</div>
+                </div>
+                
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        오늘 매출
+                        <div class="kpi-icon secondary"><i class="ph ph-currency-krw"></i></div>
+                    </div>
+                    <div class="kpi-value">450,000원</div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        이번 달 누적 매출
+                        <div class="kpi-icon secondary"><i class="ph ph-chart-bar"></i></div>
+                    </div>
+                    <div class="kpi-value">6,240,000원</div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        오늘 신규 고객
+                        <div class="kpi-icon primary"><i class="ph ph-user-plus"></i></div>
+                    </div>
+                    <div class="kpi-value">2명</div>
+                </div>
+            </section>
+
+            <!-- 중앙 메인 데이터 영역 -->
+            <div class="widget-main">
+                <!-- 오늘 예약 목록 -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="ph-fill ph-clock-counter-clockwise text-primary"></i>
+                            오늘 예약 목록
+                        </div>
+                        <a href="#" class="card-action">전체보기 <i class="ph ph-caret-right"></i></a>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>시간</th>
+                                <th>고객명</th>
+                                <th>연락처</th>
+                                <th>상태</th>
+                                <th>비고</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong style="color: var(--primary);">10:00</strong></td>
+                                <td>김미영</td>
+                                <td>010-1234-5678</td>
+                                <td><span class="badge completed">방문완료</span></td>
+                                <td>-</td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--primary);">11:30</strong></td>
+                                <td>이현주</td>
+                                <td>010-9876-5432</td>
+                                <td><span class="badge waiting">대기</span></td>
+                                <td>커피 준비</td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--primary);">14:00</strong></td>
+                                <td>박수진</td>
+                                <td>010-5555-4444</td>
+                                <td><span class="badge waiting">예약완료</span></td>
+                                <td>헤나 잔량 확인 필요</td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--primary);">16:00</strong></td>
+                                <td>정유미 <span style="font-size:12px; color:var(--text-muted)">(신규)</span></td>
+                                <td>010-1111-2222</td>
+                                <td><span class="badge waiting">예약완료</span></td>
+                                <td>전화 상담 후 예약</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 최근 시술 기록 -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="ph-fill ph-check-circle text-primary"></i>
+                            최근 시술 기록
+                        </div>
+                        <a href="#" class="card-action">상세보기 <i class="ph ph-caret-right"></i></a>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>완료시간</th>
+                                <th>고객명</th>
+                                <th>시술내용</th>
+                                <th>결제금액</th>
+                                <th>결제수단</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>11:45</td>
+                                <td>김미영</td>
+                                <td>기본 헤나 염색 + 두피케어</td>
+                                <td><strong>80,000원</strong></td>
+                                <td>카드</td>
+                            </tr>
+                            <tr>
+                                <td>어제 17:30</td>
+                                <td>최은지</td>
+                                <td>기본 헤나 염색</td>
+                                <td><strong>50,000원</strong></td>
+                                <td>현금</td>
+                            </tr>
+                            <tr>
+                                <td>어제 15:00</td>
+                                <td>강지원</td>
+                                <td>헤나 복구 염색</td>
+                                <td><strong>120,000원</strong></td>
+                                <td>계좌이체</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 우측 액션/경고 위젯 -->
+            <div class="widget-side">
+                
+                <!-- 염색약 부족 고객 -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="ph-fill ph-warning-circle" style="color: var(--danger);"></i>
+                            염색약 부족 (소진 임박)
+                        </div>
+                    </div>
+                    <div class="list">
+                        <div class="list-item">
+                            <div class="list-user">
+                                <div class="avatar" style="background: rgba(224, 122, 95, 0.2); color: var(--danger); font-size: 14px;">오</div>
+                                <div class="user-info">
+                                    <span class="user-name">오영희</span>
+                                    <span class="user-meta">잔여: <span class="text-danger">0.5회분 (경고)</span></span>
+                                </div>
+                            </div>
+                            <div class="action-btns">
+                                <button class="btn-icon" title="문자 발송"><i class="ph-fill ph-chat-text"></i></button>
+                                <button class="btn-icon" title="전화 걸기"><i class="ph-fill ph-phone-call"></i></button>
+                            </div>
+                        </div>
+                        <div class="list-item">
+                            <div class="list-user">
+                                <div class="avatar" style="background: rgba(242, 204, 143, 0.4); color: #D4A017; font-size: 14px;">한</div>
+                                <div class="user-info">
+                                    <span class="user-name">한지민</span>
+                                    <span class="user-meta">잔여: <strong style="color:#D4A017;">1.0회분 (주의)</strong></span>
+                                </div>
+                            </div>
+                            <div class="action-btns">
+                                <button class="btn-icon"><i class="ph-fill ph-chat-text"></i></button>
+                                <button class="btn-icon"><i class="ph-fill ph-phone-call"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 재방문 필요 고객 -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="ph-fill ph-calendar-blank text-primary"></i>
+                            재방문 안내 권장
+                        </div>
+                    </div>
+                    <div class="list">
+                        <div class="list-item">
+                            <div class="list-user">
+                                <div class="avatar" style="font-size: 14px; background: whitesmoke; color: var(--text-main);">박</div>
+                                <div class="user-info">
+                                    <span class="user-name">박영선</span>
+                                    <span class="user-meta">최근방문: 45일 전</span>
+                                </div>
+                            </div>
+                            <div class="action-btns">
+                                <button class="btn-icon"><i class="ph-fill ph-chat-text"></i></button>
+                            </div>
+                        </div>
+                        <div class="list-item">
+                            <div class="list-user">
+                                <div class="avatar" style="font-size: 14px; background: whitesmoke; color: var(--text-main);">이</div>
+                                <div class="user-info">
+                                    <span class="user-name">이정화</span>
+                                    <span class="user-meta">최근방문: 60일 전</span>
+                                </div>
+                            </div>
+                            <div class="action-btns">
+                                <button class="btn-icon"><i class="ph-fill ph-chat-text"></i></button>
+                            </div>
+                        </div>
+                        <div class="list-item">
+                            <div class="list-user">
+                                <div class="avatar" style="font-size: 14px; background: whitesmoke; color: var(--text-main);">장</div>
+                                <div class="user-info">
+                                    <span class="user-name">장미란</span>
+                                    <span class="user-meta">최근방문: 65일 전</span>
+                                </div>
+                            </div>
+                            <div class="action-btns">
+                                <button class="btn-icon"><i class="ph-fill ph-chat-text"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+</body>
+</html>
