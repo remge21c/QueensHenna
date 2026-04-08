@@ -10,13 +10,13 @@ function Avatar({ name, src, className, ...props }: AvatarProps) {
   const initial = name.charAt(0)
   
   // Use a hash-based color if not provided
-  const bgColors = ["bg-primary", "bg-secondary", "bg-primary-light", "bg-secondary/40"]
+  const bgColors = ["bg-primary", "bg-secondary", "bg-primary-container", "bg-secondary/40"]
   const bgColor = bgColors[name.length % bgColors.length]
 
   return (
     <div
       className={cn(
-        "flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white shadow-sm overflow-hidden",
+        "flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold text-primary-foreground shadow-sm overflow-hidden",
         bgColor,
         className
       )}

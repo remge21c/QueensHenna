@@ -5,67 +5,190 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* 디자인 시스템 색상 복구 (designs/dashboard.html 참조) */
-  --primary: #5A7163;      /* 올리브 그린 */
-  --primary-foreground: #FFFFFF;
-  
-  --primary-light: #8BA895;
-  --secondary: #D4B08C;    /* 베이지/골드 */
-  --secondary-foreground: #FFFFFF;
-  
-  --background: #F9F8F6;   /* 오프화이트 배경 */
-  --foreground: #333333;   /* 메인 텍스트 */
-  
-  --surface: #FFFFFF;
-  --card: #FFFFFF;
-  --card-foreground: #333333;
-  
-  --popover: #FFFFFF;
-  --popover-foreground: #333333;
-  
-  --muted: #F3F4F6;
-  --muted-foreground: #777777;
-  
-  --accent: #F9F8F6;
-  --accent-foreground: #5A7163;
-  
-  --destructive: #E07A5F;
-  --destructive-foreground: #FFFFFF;
+  /* ── Regal Verdance Design System (Material Design 3) ── */
 
-  --border: #EAE6DF;
-  --input: #EAE6DF;
-  --ring: #5A7163;
+  /* Primary */
+  --primary: #576063;
+  --primary-dim: #4b5457;
+  --primary-container: #dbe4e7;
+  --primary-foreground: #f0f9fc;
+  --on-primary-container: #4a5356;
+  --primary-fixed: #dbe4e7;
+  --primary-fixed-dim: #cdd6d9;
 
-  --radius-md: 12px;
-  --radius-lg: 20px;
+  /* Secondary */
+  --secondary: #5d5f61;
+  --secondary-dim: #515355;
+  --secondary-container: #e1e2e4;
+  --secondary-foreground: #f8f9fb;
+  --on-secondary-container: #505254;
+
+  /* Tertiary */
+  --tertiary: #4b6274;
+  --tertiary-dim: #3f5667;
+  --tertiary-container: #d0e8fe;
+  --tertiary-foreground: #f5f9ff;
+  --on-tertiary-container: #3f5668;
+
+  /* Error / Destructive */
+  --error: #9f403d;
+  --error-dim: #4e0309;
+  --error-container: #fe8983;
+  --error-foreground: #fff7f6;
+  --destructive: #9f403d;
+  --destructive-foreground: #ffffff;
+
+  /* Surface */
+  --surface: #fbf9f9;
+  --surface-dim: #d7dbdb;
+  --surface-bright: #fbf9f9;
+  --surface-variant: #e1e3e3;
+  --surface-tint: #576063;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #f4f3f3;
+  --surface-container: #eeeeee;
+  --surface-container-high: #e7e8e8;
+  --surface-container-highest: #e1e3e3;
+  --on-surface: #303334;
+  --on-surface-variant: #5c6060;
+
+  /* Inverse */
+  --inverse-surface: #0d0e0f;
+  --inverse-on-surface: #9d9d9d;
+  --inverse-primary: #e6eff3;
+
+  /* Outline */
+  --outline: #787b7c;
+  --outline-variant: #b0b2b3;
+
+  /* Background & Foreground */
+  --background: #fbf9f9;
+  --foreground: #303334;
+
+  /* Brand (original palette) */
+  --brand-primary: #70797c;
+  --brand-secondary: #757779;
+  --brand-tertiary: #637a8d;
+
+  /* Mapped tokens for shadcn compatibility */
+  --card: var(--surface-container-lowest);
+  --card-foreground: var(--on-surface);
+  --popover: var(--surface-container-lowest);
+  --popover-foreground: var(--on-surface);
+  --muted: var(--surface-container-low);
+  --muted-foreground: var(--on-surface-variant);
+  --accent: var(--surface-container);
+  --accent-foreground: var(--primary);
+  --border: #57606330;
+  --input: #57606330;
+  --ring: var(--primary);
+
+  /* Radius */
+  --radius-xs: 0.125rem;
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
+  --radius-3xl: 1.5rem;
+  --radius-4xl: 2rem;
+  --radius-5xl: 2.5rem;
   --radius: 0.75rem;
+
+  /* Shadows */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.08);
+  --shadow-xl: 0 12px 32px rgba(0, 0, 0, 0.10);
+  --shadow-primary: 0 4px 12px rgba(87, 96, 99, 0.2);
+
+  /* Layout */
+  --sidebar-width: 280px;
+  --topbar-height: 64px;
+  --max-content-width: 1400px;
 }
 
 @theme inline {
+  /* Background & Foreground */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  
+
+  /* Primary */
   --color-primary: var(--primary);
+  --color-primary-dim: var(--primary-dim);
   --color-primary-foreground: var(--primary-foreground);
-  --color-primary-light: var(--primary-light);
-  
+  --color-primary-container: var(--primary-container);
+  --color-on-primary-container: var(--on-primary-container);
+
+  /* Secondary */
   --color-secondary: var(--secondary);
+  --color-secondary-dim: var(--secondary-dim);
   --color-secondary-foreground: var(--secondary-foreground);
-  
+  --color-secondary-container: var(--secondary-container);
+  --color-on-secondary-container: var(--on-secondary-container);
+
+  /* Tertiary */
+  --color-tertiary: var(--tertiary);
+  --color-tertiary-dim: var(--tertiary-dim);
+  --color-tertiary-foreground: var(--tertiary-foreground);
+  --color-tertiary-container: var(--tertiary-container);
+  --color-on-tertiary-container: var(--on-tertiary-container);
+
+  /* Error */
+  --color-error: var(--error);
+  --color-error-container: var(--error-container);
+  --color-error-foreground: var(--error-foreground);
+
+  /* Surface */
   --color-surface: var(--surface);
+  --color-surface-dim: var(--surface-dim);
+  --color-surface-bright: var(--surface-bright);
+  --color-surface-variant: var(--surface-variant);
+  --color-surface-container: var(--surface-container);
+  --color-surface-container-low: var(--surface-container-low);
+  --color-surface-container-high: var(--surface-container-high);
+  --color-surface-container-highest: var(--surface-container-highest);
+  --color-on-surface: var(--on-surface);
+  --color-on-surface-variant: var(--on-surface-variant);
+
+  /* Inverse */
+  --color-inverse-surface: var(--inverse-surface);
+  --color-inverse-on-surface: var(--inverse-on-surface);
+
+  /* Outline */
+  --color-outline: var(--outline);
+  --color-outline-variant: var(--outline-variant);
+
+  /* Brand */
+  --color-brand-primary: var(--brand-primary);
+  --color-brand-secondary: var(--brand-secondary);
+  --color-brand-tertiary: var(--brand-tertiary);
+
+  /* Shadcn compat */
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
-  
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
   --color-danger: #E07A5F;
   --color-warning: #F2CC8F;
+  --color-success: #4ade80;
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
 
-  --radius-md: var(--radius-md);
-  --radius-lg: var(--radius-lg);
+  /* Radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
+  --radius-3xl: 1.5rem;
 
-  --font-sans: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  /* Font */
+  --font-sans: "Pretendard", "Public Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-headline: "Public Sans", "Pretendard", sans-serif;
 }
 
 @layer base {
@@ -80,7 +203,8 @@
   }
 }
 
-/* 공통 클래스 및 전역 스타일 */
+/* ── Utility Classes ─────────────────────────────────── */
+
 .glass {
   background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(8px);
@@ -89,11 +213,66 @@
 }
 
 .card-shadow {
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  box-shadow: var(--shadow-sm);
 }
 
 .card-shadow-hover:hover {
-  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+  box-shadow: var(--shadow-lg);
   transform: translateY(-2px);
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.surface-elevated {
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+.surface-elevated-hover:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Button Presets ──────────────────────────────────── */
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-weight: 700;
+  border-radius: var(--radius-lg);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(87, 96, 99, 0.15);
+}
+.btn-primary:hover {
+  background: var(--primary-dim);
+}
+.btn-primary:active {
+  transform: scale(0.98);
+}
+.btn-primary:disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  background: var(--surface-container-lowest);
+  color: var(--on-surface);
+  font-weight: 700;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.btn-secondary:hover {
+  background: var(--surface-container);
+  border-color: var(--primary);
+  color: var(--primary);
 }

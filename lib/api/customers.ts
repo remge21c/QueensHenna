@@ -8,7 +8,7 @@ export async function getCustomers() {
     .from('customers')
     .select(`
       *,
-      treatments(treated_at, status),
+      treatments(treated_at),
       customer_dye_stocks(
         id,
         status,
@@ -26,17 +26,16 @@ export async function getCustomers() {
 
   // 데이터 가공 (프론트엔드에서 사용하기 편한 형태로 변환)
   return data.map((customer: any) => {
-    // 가장 최근의 '방문완료' 일자 찾기
+    // 가장 최근의 시술 기록 찾기
     const lastTreatment = customer.treatments
-      ?.filter((t: any) => t.status === '방문완료')
-      .sort((a: any, b: any) => 
+      ?.sort((a: any, b: any) => 
         new Date(b.treated_at).getTime() - new Date(a.treated_at).getTime()
       )[0]
 
     return {
       ...customer,
       last_visit: lastTreatment?.treated_at || null,
-      total_visits: customer.treatments?.filter((t: any) => t.status === '방문완료').length || 0,
+      total_visits: customer.treatments?.length || 0,
       // 대표 염색약 하나만 표시 (필요 시 수정 가능)
       primary_stock: customer.customer_dye_stocks?.[0] || null
     }

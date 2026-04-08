@@ -15,11 +15,10 @@ interface Reservation {
 
 interface ReservationTimelineProps {
   reservations: Reservation[]
-  selectedDate: string // YYYY-MM-DD
+  selectedDate: string
 }
 
 export default function ReservationTimeline({ reservations, selectedDate }: ReservationTimelineProps) {
-  // Generate time slots (9 AM to 8 PM)
   const slots = Array.from({ length: 12 }, (_, i) => i + 9)
 
   const getReservationsForSlot = (hour: number) => {
@@ -30,7 +29,7 @@ export default function ReservationTimeline({ reservations, selectedDate }: Rese
   }
 
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-sm border border-[#EAE6DF] mt-6">
+    <div className="bg-card rounded-xl p-6 card-shadow border border-border mt-6">
       <div className="overflow-x-auto">
         <table className="w-full">
           <tbody>
@@ -39,8 +38,8 @@ export default function ReservationTimeline({ reservations, selectedDate }: Rese
               const timeLabel = `${hour.toString().padStart(2, '0')}:00`
 
               return (
-                <tr key={hour} className="border-b border-[#F5F2ED] last:border-0 group/row">
-                  <td className="py-6 pr-6 font-semibold text-[#777777] border-r border-[#F5F2ED] w-[100px] text-center align-top whitespace-nowrap">
+                <tr key={hour} className="border-b border-surface-variant last:border-0 group/row">
+                  <td className="py-6 pr-6 font-semibold text-muted-foreground border-r border-surface-variant w-[100px] text-center align-top whitespace-nowrap">
                     <div className="flex flex-col items-center gap-1">
                       <span>{timeLabel}</span>
                       {slotReservations.length >= 3 && (
@@ -54,21 +53,21 @@ export default function ReservationTimeline({ reservations, selectedDate }: Rese
                     {slotReservations.length > 0 ? (
                       <div className="grid gap-3">
                         {slotReservations.map(res => (
-                          <div 
-                            key={res.id} 
-                            className="bg-[#5A716308] border-l-4 border-[#5A7163] p-4 rounded-xl flex justify-between items-start hover:bg-[#5A71630C] transition-colors cursor-pointer group/card"
+                          <div
+                            key={res.id}
+                            className="bg-primary/5 border-l-4 border-primary p-4 rounded-xl flex justify-between items-start hover:bg-primary/10 transition-colors cursor-pointer group/card"
                           >
                             <div className="flex flex-col gap-1">
                               <div className="flex items-center gap-2">
-                                <span className="font-bold text-[#333333] text-lg">{res.customer.name}</span>
-                                <span className="text-sm font-medium text-[#777777]">
+                                <span className="font-bold text-foreground text-lg">{res.customer.name}</span>
+                                <span className="text-sm font-medium text-muted-foreground">
                                   {format(parseISO(res.reserved_at), 'HH:mm')}
                                 </span>
                               </div>
-                              <p className="text-sm text-[#666666] leading-relaxed">{res.memo}</p>
+                              <p className="text-sm text-on-surface-variant leading-relaxed">{res.memo}</p>
                             </div>
-                            <Badge 
-                              variant={res.status === '방문완료' ? 'secondary' : 'success'} 
+                            <Badge
+                              variant={res.status === '방문완료' ? 'secondary' : 'success'}
                               className="px-3 py-1 text-sm font-medium"
                             >
                               {res.status}
@@ -77,7 +76,7 @@ export default function ReservationTimeline({ reservations, selectedDate }: Rese
                         ))}
                       </div>
                     ) : (
-                      <button className="w-full border border-dashed border-[#EAE6DF] text-[#A19D95] text-sm py-4 rounded-xl flex items-center justify-center gap-2 hover:bg-[#F9F8F6] hover:border-[#5A7163] hover:text-[#5A7163] transition-all group/btn">
+                      <button className="w-full border border-dashed border-border text-outline-variant text-sm py-4 rounded-xl flex items-center justify-center gap-2 hover:bg-muted hover:border-primary hover:text-primary transition-all group/btn">
                         <Plus weight="bold" className="group-hover/btn:scale-110 transition-transform" />
                         <span>예약 추가</span>
                       </button>

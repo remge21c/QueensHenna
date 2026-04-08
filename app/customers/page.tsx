@@ -24,7 +24,7 @@ export default async function CustomersPage() {
           </div>
           <div>
             <h1 className="text-3xl font-bold text-foreground tracking-tight">고객 관리</h1>
-            <p className="text-sm text-muted">고객 정보 및 시술 이력 통합 관리</p>
+            <p className="text-sm text-muted-foreground">고객 정보 및 시술 이력 통합 관리</p>
           </div>
         </div>
         <Link 
@@ -37,13 +37,13 @@ export default async function CustomersPage() {
       </header>
 
       {/* 메인 카드 */}
-      <div className="bg-surface rounded-2xl border border-border card-shadow p-6 flex flex-col gap-6">
+      <div className="bg-card rounded-xl border border-border card-shadow p-6 flex flex-col gap-6">
         
         {/* 검색 및 필터 바 */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="w-full md:max-w-md relative group">
             <MagnifyingGlass 
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-muted group-focus-within:text-primary transition-colors" 
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" 
               size={20} 
             />
             <input 
@@ -54,17 +54,17 @@ export default async function CustomersPage() {
           </div>
           
           <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0">
-            <button className="whitespace-nowrap px-4 py-2 rounded-full bg-primary text-white text-sm font-semibold shadow-md shadow-primary/10">
+            <button className="whitespace-nowrap px-4 py-2 rounded-full bg-primary text-primary-foreground text-sm font-semibold shadow-md shadow-primary/10">
               전체조회
             </button>
-            <button className="whitespace-nowrap px-4 py-2 rounded-full bg-background border border-border text-muted hover:text-primary hover:border-primary transition-all text-sm font-medium">
+            <button className="whitespace-nowrap px-4 py-2 rounded-full bg-background border border-border text-muted-foreground hover:text-primary hover:border-primary transition-all text-sm font-medium">
               재방문 필요
             </button>
-            <button className="whitespace-nowrap px-4 py-2 rounded-full bg-background border border-border text-muted hover:text-primary hover:border-primary transition-all text-sm font-medium">
+            <button className="whitespace-nowrap px-4 py-2 rounded-full bg-background border border-border text-muted-foreground hover:text-primary hover:border-primary transition-all text-sm font-medium">
               염색약 부족
             </button>
             <div className="h-4 w-[1px] bg-border mx-1 hidden md:block" />
-            <button className="p-2.5 rounded-xl border border-border text-muted hover:text-primary hover:bg-primary/5 transition-all">
+            <button className="p-2.5 rounded-xl border border-border text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all">
               <Funnel size={18} />
             </button>
           </div>
@@ -75,7 +75,7 @@ export default async function CustomersPage() {
       </div>
 
       {/* 푸터 정보 */}
-      <div className="flex justify-between items-center text-[13px] text-muted-light mt-4">
+      <div className="flex justify-between items-center text-[13px] text-outline-variant mt-4">
         <span>총 <strong>{customers.length}명</strong>의 고객이 등록되어 있습니다.</span>
         <div className="flex gap-4">
           <Link href="/help" className="hover:text-primary underline">도움말</Link>

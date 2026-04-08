@@ -169,19 +169,26 @@ cd ../project-phase2-customers
 - [x] 예약 등록 서버 액션 구현 (`createReservation`)
 **산출물**: `components/reservations/ReservationForm.tsx`
 
-### [] Phase 5, T5.1: 시술 등록 UI 이식 및 RPC 연동 (RED-GREEN)
+### [x] Phase 5, T5.1: 시술 등록 UI 이식 및 RPC 연동 (RED-GREEN)
 **담당**: frontend-specialist / database-specialist
 **디자인 소스**: `designs/treatment-register.html`
-**Git Worktree 설정**:
-```bash
-git worktree add ../project-phase5-treatment -b phase/5-treatment
-cd ../project-phase5-treatment
-```
-**TDD 사이클**:
-1. **RED**: `tests/treatments/TreatmentRegister.test.tsx` 작성
-2. **GREEN**: `treatment-register.html` UI 이식 및 `save_treatment_with_dye` RPC 호출 연동
-3. **REFACTOR**: 폼 유효성 검사 및 에러 처리 정리
-**산출물**: `app/treatments/register/page.tsx`, `lib/api/treatment.ts`
+**작업 내용**:
+- [x] 시술 등록 폼 UI 개발 및 검색 연동 (`TreatmentForm`)
+- [x] 시술 등록 및 재고 차감 RPC 구현 (`register_treatment`)
+- [x] 시술 등록 서버 액션 연동 및 테스트 통과
+**산출물**: `app/treatments/page.tsx`, `components/treatments/TreatmentForm.tsx`, `supabase/migrations/0003_add_treatment_logic.sql`
+
+### [x] Phase 5, T5.2: 고객 레시피(최근 시술 내역) 불러오기 및 저장 (RED-GREEN)
+- [x] 전회 시술 데이터 조회 서버 액션 구현 (`getLatestTreatmentUsage`)
+- [x] 기본 레시피 자동 로드 및 저장 기능 구현 (`saveDefaultRecipe`, `getDefaultRecipe`)
+- [x] UI 연동 및 테스트 완료
+**산출물**: `app/treatments/actions.ts`, `components/treatments/TreatmentForm.tsx`
+
+### [x] Phase 6, T6.1: 설정 및 데이터 백업/복원 구현 (RED-GREEN)
+- [x] `settings.html` 기반 UI 개발 및 탭 네비게이션 구현
+- [x] 전체 DB 테이블 JSON 백업 기능 구현 (`getBackupData`)
+- [x] JSON 파일 업로드 및 데이터 복원 기능 구현 (`restoreData`)
+**산출물**: `app/settings/page.tsx`, `app/settings/actions.ts`
 
 ---
 
@@ -198,6 +205,18 @@ graph TD
     M3 --> M5[M5: Treatment & Stock]
     M2 --> M1
 ```
+
+### [x] Phase 7, T7.1: 대시보드 UI 이식 및 실시간 통계 연동 (RED-GREEN)
+- [x] `dashboard.html` 기반 메인 UI 및 KPI 카드 구현
+- [x] 오늘 예약, 매출, 신규 고객, 저재고 알림 실시간 데이터 로드
+- [x] `app/dashboard/actions.ts`를 통한 데이터 집계 로직 구현
+**산출물**: `app/page.tsx`, `app/dashboard/actions.ts`
+
+### [x] Phase 7, T7.2: 매출 통계 페이지 및 일자별 집계 구현 (RED-GREEN)
+- [x] `sales.html` 기반 매출 상세 UI 구현
+- [x] 일자별 매출 추이 시각화 (CSS/SVG 기반) 및 데이터 테이블 구현
+- [x] 월별 필터링 및 카드/현금 비율 계산 로직 연동
+**산출물**: `app/sales/page.tsx`, `app/sales/actions.ts`
 
 ---
 

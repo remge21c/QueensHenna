@@ -18,7 +18,7 @@ export default async function RegisterPurchasePage() {
       <header className="flex flex-col gap-4">
         <Link 
           href="/inventory" 
-          className="flex items-center gap-2 text-sm text-muted hover:text-primary transition-colors w-fit"
+          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors w-fit"
         >
           <CaretLeft size={16} weight="bold" />
           염색약 관리 목록으로 돌아가기
@@ -29,13 +29,13 @@ export default async function RegisterPurchasePage() {
           </div>
           <div>
             <h1 className="text-3xl font-bold text-foreground tracking-tight">염색약 구매/보충 등록</h1>
-            <p className="text-sm text-muted">고객이 구매하거나 보충한 염색약 내역을 시스템에 기록합니다.</p>
+            <p className="text-sm text-muted-foreground">고객이 구매하거나 보충한 염색약 내역을 시스템에 기록합니다.</p>
           </div>
         </div>
       </header>
 
       {/* 메인 폼 카드 */}
-      <div className="bg-surface rounded-2xl border border-border card-shadow p-8 max-w-3xl">
+      <div className="bg-card rounded-xl border border-border card-shadow p-8 max-w-3xl">
         <DyePurchaseForm 
           customers={customers || []} 
           dyeTypes={dyeTypes || []}
@@ -45,7 +45,7 @@ export default async function RegisterPurchasePage() {
       </div>
 
       {/* 안내 섹션 */}
-      <div className="flex flex-col gap-6 max-w-xl text-sm text-muted leading-relaxed">
+      <div className="flex flex-col gap-6 max-w-xl text-sm text-muted-foreground leading-relaxed">
         <div className="p-6 rounded-xl bg-primary/5 border border-primary/10 flex gap-4">
           <div className="text-primary mt-0.5">
             <PlusCircle size={20} weight="fill" />

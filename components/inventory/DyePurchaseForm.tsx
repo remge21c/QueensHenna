@@ -35,7 +35,7 @@ export default function DyePurchaseForm({
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema) as any,
     defaultValues: {
       customer_id: "",
       dye_id: "",

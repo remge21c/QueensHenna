@@ -11,7 +11,7 @@ export default function RegisterCustomerPage() {
       <header className="flex flex-col gap-4">
         <Link 
           href="/customers" 
-          className="flex items-center gap-2 text-sm text-muted hover:text-primary transition-colors w-fit"
+          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors w-fit"
         >
           <CaretLeft size={16} weight="bold" />
           고객 목록으로 돌아가기
@@ -22,13 +22,13 @@ export default function RegisterCustomerPage() {
           </div>
           <div>
             <h1 className="text-3xl font-bold text-foreground tracking-tight">신규 고객 등록</h1>
-            <p className="text-sm text-muted">새로운 고객을 시스템에 등록하고 기본 정보를 관리합니다.</p>
+            <p className="text-sm text-muted-foreground">새로운 고객을 시스템에 등록하고 기본 정보를 관리합니다.</p>
           </div>
         </div>
       </header>
 
       {/* 메인 카드 */}
-      <div className="bg-surface rounded-2xl border border-border card-shadow p-8">
+      <div className="bg-card rounded-xl border border-border card-shadow p-8">
         <CustomerRegisterForm onSubmit={createCustomer} />
       </div>
 
@@ -37,7 +37,7 @@ export default function RegisterCustomerPage() {
         <div className="text-primary mt-1">
           <PlusCircle size={20} weight="fill" />
         </div>
-        <div className="text-sm text-muted leading-relaxed">
+        <div className="text-sm text-muted-foreground leading-relaxed">
           <strong className="text-foreground block mb-1">고객 등록 팁</strong>
           고객명과 연락처는 필수 입력 사항입니다. 생년월일을 기록해두면 추후 이벤트 알림이나 축하 문자 발송에 활용할 수 있습니다.
         </div>

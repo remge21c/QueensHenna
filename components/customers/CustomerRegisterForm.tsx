@@ -54,7 +54,7 @@ export default function CustomerRegisterForm({
     <form onSubmit={handleSubmit(formSubmit)} className="flex flex-col gap-6 max-w-xl">
       {/* 고객명 */}
       <div className="flex flex-col gap-2">
-        <label htmlFor="name" className="text-sm font-semibold text-muted flex items-center gap-2">
+        <label htmlFor="name" className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
           <User size={16} />
           고객명
           <span className="text-danger">*</span>
@@ -80,7 +80,7 @@ export default function CustomerRegisterForm({
 
       {/* 연락처 */}
       <div className="flex flex-col gap-2">
-        <label htmlFor="phone" className="text-sm font-semibold text-muted flex items-center gap-2">
+        <label htmlFor="phone" className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
           <Phone size={16} />
           연락처
           <span className="text-danger">*</span>
@@ -106,7 +106,7 @@ export default function CustomerRegisterForm({
 
       {/* 생년월일 */}
       <div className="flex flex-col gap-2">
-        <label htmlFor="birth_date" className="text-sm font-semibold text-muted flex items-center gap-2">
+        <label htmlFor="birth_date" className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
           <Calendar size={16} />
           생년월일
         </label>
@@ -120,7 +120,7 @@ export default function CustomerRegisterForm({
 
       {/* 메모 */}
       <div className="flex flex-col gap-2">
-        <label htmlFor="memo" className="text-sm font-semibold text-muted flex items-center gap-2">
+        <label htmlFor="memo" className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
           <Notepad size={16} />
           참이(메모)
         </label>

@@ -20,13 +20,13 @@ export default function InventoryTable({ inventory }: { inventory: InventoryItem
       <table className="w-full border-collapse">
         <thead>
           <tr className="border-b-2 border-border text-left">
-            <th className="p-4 text-sm font-semibold text-muted">고객명</th>
-            <th className="p-4 text-sm font-semibold text-muted">염색약 종류</th>
-            <th className="p-4 text-sm font-semibold text-muted">구매 총량</th>
-            <th className="p-4 text-sm font-semibold text-muted">현재 잔량</th>
-            <th className="p-4 text-sm font-semibold text-muted">1회 기준 사용량</th>
-            <th className="p-4 text-sm font-semibold text-muted text-center">예상 남은 횟수</th>
-            <th className="p-4 text-sm font-semibold text-muted text-right">상태</th>
+            <th className="p-4 text-sm font-semibold text-muted-foreground">고객명</th>
+            <th className="p-4 text-sm font-semibold text-muted-foreground">염색약 종류</th>
+            <th className="p-4 text-sm font-semibold text-muted-foreground">구매 총량</th>
+            <th className="p-4 text-sm font-semibold text-muted-foreground">현재 잔량</th>
+            <th className="p-4 text-sm font-semibold text-muted-foreground">1회 기준 사용량</th>
+            <th className="p-4 text-sm font-semibold text-muted-foreground text-center">예상 남은 횟수</th>
+            <th className="p-4 text-sm font-semibold text-muted-foreground text-right">상태</th>
           </tr>
         </thead>
         <tbody>
@@ -43,11 +43,11 @@ export default function InventoryTable({ inventory }: { inventory: InventoryItem
                     {item.dye_type?.name}
                   </div>
                 </td>
-                <td className="p-4 text-muted-light">{item.purchased_amount}{item.unit?.name || 'g'}</td>
+                <td className="p-4 text-outline-variant">{item.purchased_amount}{item.unit?.name || 'g'}</td>
                 <td className="p-4 font-medium text-primary">
                   {item.current_amount}{item.unit?.name || 'g'}
                 </td>
-                <td className="p-4 text-muted">{item.recipe_amount}{item.unit?.name || 'g'}</td>
+                <td className="p-4 text-muted-foreground">{item.recipe_amount}{item.unit?.name || 'g'}</td>
                 <td className="p-4 text-center">
                   <span className={`font-bold ${isExhausted ? 'text-danger' : isLow ? 'text-warning' : 'text-foreground'}`}>
                     {item.remaining_uses}회

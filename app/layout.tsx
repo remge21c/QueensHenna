@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import Sidebar from "@/components/layout/Sidebar";
 import "./globals.css";
-import { Geist } from "next/font/google";
+import { Public_Sans } from "next/font/google";
 import { cn } from "@/lib/utils";
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+const publicSans = Public_Sans({ subsets: ["latin"], variable: "--font-headline" });
 
 export const metadata: Metadata = {
   title: "퀸즈헤나 고객관리 시스템",
@@ -19,10 +19,9 @@ export default function RootLayout({
   return (
     <html
       lang="ko"
-      className={cn("h-full antialiased", "font-sans", geist.variable)}
+      className={cn("h-full antialiased", "font-sans", publicSans.variable)}
     >
       <head>
-        {/* Pretendard 폰트 불러오기 (v1.3.9) */}
         <link
           rel="stylesheet"
           as="style"
@@ -30,12 +29,11 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-row bg-background text-foreground font-sans m-0 p-0 overflow-hidden">
-        {/* 사이드바 */}
         <Sidebar />
-
-        {/* 메인 컨텐츠 영역 */}
-        <main className="flex-1 h-screen overflow-y-auto px-10 py-10">
-          {children}
+        <main className="flex-1 h-screen overflow-y-auto">
+          <div className="max-w-[1200px] mx-auto px-8 py-8">
+            {children}
+          </div>
         </main>
       </body>
     </html>
