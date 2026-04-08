@@ -9,13 +9,13 @@ export default async function InventoryPage() {
   return (
     <div className="flex flex-col gap-8 animate-in fade-in duration-500">
       {/* 헤더 */}
-      <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+      <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 pb-6 sticky top-0 z-20 bg-background -mx-4 px-4 pt-4 -mt-4 md:-mx-8 md:px-8 md:pt-8 md:-mt-8">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary shadow-sm border border-primary/10">
             <Drop size={28} weight="fill" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-foreground tracking-tight">염색약 관리 (고객 할당 현황)</h1>
+            <h1 className="text-xl md:text-3xl font-bold text-foreground tracking-tight">염색약 관리 (고객 할당 현황)</h1>
             <p className="text-sm text-muted-foreground">고객별 잔여 현황 및 예상 남은 시술 횟수를 확인합니다.</p>
           </div>
         </div>

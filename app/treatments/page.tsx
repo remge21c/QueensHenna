@@ -40,9 +40,9 @@ export default function TreatmentsPage() {
     <div className="space-y-8 animate-in fade-in duration-500">
 
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 pb-6 sticky top-0 z-20 bg-background -mx-4 px-4 pt-4 -mt-4 md:-mx-8 md:px-8 md:pt-8 md:-mt-8">
         <div>
-          <h1 className="text-3xl font-bold text-foreground mb-2 tracking-tight">시술 기록 관리</h1>
+          <h1 className="text-xl md:text-3xl font-bold text-foreground mb-2 tracking-tight">시술 기록 관리</h1>
           <p className="text-muted-foreground">고객님의 시술 내역을 확인하고 새로운 기록을 등록하세요.</p>
         </div>
         <button

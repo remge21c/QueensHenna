@@ -39,7 +39,7 @@ export default function ReservationTimeline({ reservations, selectedDate }: Rese
 
               return (
                 <tr key={hour} className="border-b border-surface-variant last:border-0 group/row">
-                  <td className="py-6 pr-6 font-semibold text-muted-foreground border-r border-surface-variant w-[100px] text-center align-top whitespace-nowrap">
+                  <td className="py-4 md:py-6 pr-3 md:pr-6 font-semibold text-muted-foreground border-r border-surface-variant w-[60px] md:w-[100px] text-center align-top whitespace-nowrap text-sm md:text-base">
                     <div className="flex flex-col items-center gap-1">
                       <span>{timeLabel}</span>
                       {slotReservations.length >= 3 && (
@@ -49,7 +49,7 @@ export default function ReservationTimeline({ reservations, selectedDate }: Rese
                       )}
                     </div>
                   </td>
-                  <td className="py-4 pl-6 align-top">
+                  <td className="py-4 pl-3 md:pl-6 align-top">
                     {slotReservations.length > 0 ? (
                       <div className="grid gap-3">
                         {slotReservations.map(res => (

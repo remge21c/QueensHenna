@@ -51,15 +51,15 @@ export default function DashboardPage() {
 
   return (
     <div className="animate-in fade-in duration-700">
-      <header className="flex justify-between items-center mb-10">
+      <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 sticky top-0 z-20 bg-background -mx-4 px-4 pt-4 -mt-4 md:-mx-8 md:px-8 md:pt-8 md:-mt-8">
         <div>
-          <h1 className="text-3xl font-black text-foreground tracking-tight flex items-center gap-2">
+          <h1 className="text-xl md:text-3xl font-black text-foreground tracking-tight flex items-center gap-2">
             대시보드
             <span className="text-sm font-medium text-primary bg-primary-container px-3 py-1 rounded-full">{format(new Date(), 'M월 d일 (E)', { locale: ko })}</span>
           </h1>
           <p className="text-muted-foreground mt-1 font-headline">"오늘도 아름다운 변화를 응원합니다."</p>
         </div>
-        <div className="flex items-center gap-4 group cursor-pointer hover:bg-card p-2 pr-4 rounded-xl transition-all card-shadow border border-transparent hover:border-border">
+        <div className="hidden md:flex items-center gap-4 group cursor-pointer hover:bg-card p-2 pr-4 rounded-xl transition-all card-shadow border border-transparent hover:border-border">
           <div className="text-right">
             <p className="text-sm font-bold text-foreground">이원장</p>
             <p className="text-[10px] text-outline-variant uppercase tracking-widest font-black">Admin Access</p>
@@ -70,9 +70,9 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-10">
         {kpis.map((kpi, idx) => (
-          <div key={idx} className="bg-card p-8 rounded-xl border border-border card-shadow hover:shadow-lg hover:border-primary/20 transition-all group overflow-hidden relative">
+          <div key={idx} className="bg-card p-4 md:p-8 rounded-xl border border-border card-shadow hover:shadow-lg hover:border-primary/20 transition-all group overflow-hidden relative">
             <div className={`absolute -right-4 -top-4 w-24 h-24 rounded-full opacity-[0.03] group-hover:scale-150 transition-transform bg-${kpi.color}`} />
             <div className="flex justify-between items-start mb-4">
               <span className="text-sm font-bold text-muted-foreground">{kpi.label}</span>
@@ -80,7 +80,7 @@ export default function DashboardPage() {
                 <kpi.icon size={24} weight="bold" />
               </div>
             </div>
-            <div className="text-3xl font-black text-foreground">{kpi.value}</div>
+            <div className="text-xl md:text-3xl font-black text-foreground">{kpi.value}</div>
           </div>
         ))}
       </div>
@@ -88,7 +88,7 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <div className="lg:col-span-8 flex flex-col gap-8">
           {/* Today's Reservations */}
-          <section className="bg-card rounded-xl border border-border p-10 card-shadow relative overflow-hidden">
+          <section className="bg-card rounded-xl border border-border p-5 md:p-10card-shadow relative overflow-hidden">
             <div className="flex justify-between items-center mb-8">
               <h2 className="text-xl font-black text-foreground flex items-center gap-3">
                 <ClockCounterClockwise size={28} weight="fill" className="text-primary" />
@@ -146,7 +146,7 @@ export default function DashboardPage() {
           </section>
 
           {/* Recent Records */}
-          <section className="bg-card rounded-xl border border-border p-10 card-shadow">
+          <section className="bg-card rounded-xl border border-border p-5 md:p-10card-shadow">
             <div className="flex justify-between items-center mb-8">
               <h2 className="text-xl font-black text-foreground flex items-center gap-3">
                 <CheckCircle size={28} weight="fill" className="text-primary" />

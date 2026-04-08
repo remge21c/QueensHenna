@@ -21,7 +21,7 @@ export default function RegisterCustomerPage() {
             <PlusCircle size={28} weight="fill" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-foreground tracking-tight">신규 고객 등록</h1>
+            <h1 className="text-xl md:text-3xl font-bold text-foreground tracking-tight">신규 고객 등록</h1>
             <p className="text-sm text-muted-foreground">새로운 고객을 시스템에 등록하고 기본 정보를 관리합니다.</p>
           </div>
         </div>

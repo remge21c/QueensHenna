@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import {
   SquaresFour,
   Users,
@@ -12,7 +13,9 @@ import {
   ChartLineUp,
   Gear,
   Plant,
-  SignOut
+  SignOut,
+  List,
+  X
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 
@@ -29,9 +32,10 @@ const navItems = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
-  return (
-    <aside className="w-[var(--sidebar-width)] bg-surface border-r border-border p-6 flex-col gap-8 hidden md:flex h-screen sticky top-0">
+  const sidebarContent = (
+    <>
       <div className="flex items-center gap-3 px-2 mb-4 mt-2">
         <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-primary-foreground shadow-sm">
           <Plant weight="fill" size={22} />
@@ -52,6 +56,7 @@ export default function Sidebar() {
               <li key={item.href}>
                 <Link
                   href={item.href}
+                  onClick={() => setMobileOpen(false)}
                   className={cn(
                     "flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all duration-200 no-underline",
                     isActive
@@ -71,6 +76,7 @@ export default function Sidebar() {
       <div className="mt-auto pt-4 border-t border-border space-y-3">
         <Link
           href="/reservations"
+          onClick={() => setMobileOpen(false)}
           className="btn-primary w-full justify-center text-sm"
         >
           예약 등록
@@ -80,6 +86,58 @@ export default function Sidebar() {
           <span className="text-sm font-medium">로그아웃</span>
         </button>
       </div>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      {/* Mobile top bar */}
+      <div className="fixed top-0 left-0 right-0 z-40 flex md:hidden items-center justify-between bg-surface border-b border-border px-4 h-14">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center text-primary-foreground shadow-sm">
+            <Plant weight="fill" size={16} />
+          </div>
+          <span className="text-sm font-black text-primary">Queens Henna</span>
+        </div>
+        <button
+          onClick={() => setMobileOpen(!mobileOpen)}
+          className="p-2 rounded-lg text-foreground hover:bg-surface-container transition-colors"
+        >
+          {mobileOpen ? <X size={24} weight="bold" /> : <List size={24} weight="bold" />}
+        </button>
+      </div>
+
+      {/* Mobile spacer */}
+      <div className="h-14 md:hidden shrink-0" />
+
+      {/* Mobile overlay */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/40 md:hidden"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+
+      {/* Mobile drawer */}
+      <aside
+        className={cn(
+          "fixed top-0 left-0 z-50 w-72 h-screen bg-surface border-r border-border p-6 flex flex-col gap-8 transition-transform duration-300 md:hidden",
+          mobileOpen ? "translate-x-0" : "-translate-x-full"
+        )}
+      >
+        <button
+          onClick={() => setMobileOpen(false)}
+          className="absolute top-4 right-4 p-1 rounded-lg text-muted-foreground hover:text-foreground"
+        >
+          <X size={20} weight="bold" />
+        </button>
+        {sidebarContent}
+      </aside>
+
+      {/* Desktop sidebar */}
+      <aside className="w-[var(--sidebar-width)] bg-surface border-r border-border p-6 flex-col gap-8 hidden md:flex h-screen sticky top-0">
+        {sidebarContent}
+      </aside>
+    </>
   );
 }

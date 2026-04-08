@@ -46,7 +46,7 @@ export default async function CustomerPage({ params }: { params: { id: string } 
             <Avatar name={customer.name} className="w-16 h-16 text-xl" />
             <div>
               <div className="flex items-center gap-3">
-                <h1 className="text-3xl font-bold text-foreground tracking-tight">{customer.name}</h1>
+                <h1 className="text-xl md:text-3xl font-bold text-foreground tracking-tight">{customer.name}</h1>
                 <Badge variant="secondary" className="font-medium">
                   {customer.treatments?.length || 0}회 방문
                 </Badge>
@@ -55,7 +55,7 @@ export default async function CustomerPage({ params }: { params: { id: string } 
             </div>
           </div>
           
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
             <button className="btn-secondary">
               <ClipboardText size={18} />
               시술 기록 작성

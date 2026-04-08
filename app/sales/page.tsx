@@ -51,15 +51,15 @@ export default function SalesPage() {
 
   return (
     <div className="animate-in fade-in duration-500">
-      <header className="flex justify-between items-center mb-10">
+      <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 sticky top-0 z-20 bg-background -mx-4 px-4 pt-4 -mt-4 md:-mx-8 md:px-8 md:pt-8 md:-mt-8">
         <div>
-          <h1 className="text-3xl font-black text-foreground tracking-tight flex items-center gap-2">
+          <h1 className="text-xl md:text-3xl font-black text-foreground tracking-tight flex items-center gap-2">
             매출 통계
             <span className="text-sm font-medium text-error bg-error-container/30 px-3 py-1 rounded-full uppercase tracking-tighter">Finance Analytics</span>
           </h1>
           <p className="text-muted-foreground mt-1">지점 운영 성과와 매출 추이를 한눈에 확인하세요.</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
           <input
             type="month"
             value={targetMonth}
@@ -74,9 +74,9 @@ export default function SalesPage() {
       </header>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-10">
         {kpis.map((kpi, idx) => (
-          <div key={idx} className="bg-card p-8 rounded-xl border border-border card-shadow relative overflow-hidden group hover:scale-[1.02] transition-transform">
+          <div key={idx} className="bg-card p-4 md:p-8 rounded-xl border border-border card-shadow relative overflow-hidden group hover:scale-[1.02] transition-transform">
              <div className="flex justify-between items-start">
                <div className="z-10">
                  <p className="text-sm font-bold text-muted-foreground mb-2">{kpi.label}</p>
@@ -95,7 +95,7 @@ export default function SalesPage() {
       </div>
 
       {/* Mini Visual Chart (CSS-based) */}
-      <section className="bg-card rounded-xl border border-border p-10 card-shadow mb-10 overflow-hidden relative">
+      <section className="bg-card rounded-xl border border-border p-4 md:p-10card-shadow mb-10 overflow-hidden relative">
          <div className="flex justify-between items-center mb-10">
             <h2 className="text-xl font-black text-foreground flex items-center gap-3">
               <Selection size={28} weight="fill" className="text-primary" />
@@ -142,7 +142,7 @@ export default function SalesPage() {
       </section>
 
       {/* Detailed Table */}
-      <section className="bg-card rounded-xl border border-border p-10 card-shadow">
+      <section className="bg-card rounded-xl border border-border p-4 md:p-10card-shadow">
         <h2 className="text-xl font-black text-foreground mb-8">매출 상세 내역</h2>
         <div className="overflow-x-auto">
           <table className="w-full">

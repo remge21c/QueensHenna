@@ -28,7 +28,7 @@ export default async function RegisterPurchasePage() {
             <PlusCircle size={28} weight="fill" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-foreground tracking-tight">염색약 구매/보충 등록</h1>
+            <h1 className="text-xl md:text-3xl font-bold text-foreground tracking-tight">염색약 구매/보충 등록</h1>
             <p className="text-sm text-muted-foreground">고객이 구매하거나 보충한 염색약 내역을 시스템에 기록합니다.</p>
           </div>
         </div>
