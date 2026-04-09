@@ -64,7 +64,7 @@ export async function updateTreatmentType(id: string, name: string, defaultPrice
   const supabase = await createClient()
   const { error } = await supabase
     .from('treatment_types')
-    .update({ name, default_price: defaultPrice })
+    .update({ name, base_price: defaultPrice })
     .eq('id', id)
   
   if (error) return { success: false, error: error.message }
@@ -75,7 +75,7 @@ export async function createTreatmentType(name: string, defaultPrice: number) {
   const supabase = await createClient()
   const { error } = await supabase
     .from('treatment_types')
-    .insert({ name, default_price: defaultPrice })
+    .insert({ name, base_price: defaultPrice })
   
   if (error) return { success: false, error: error.message }
   return { success: true }
@@ -87,3 +87,5 @@ export async function deleteTreatmentType(id: string) {
   if (error) return { success: false, error: error.message }
   return { success: true }
 }
+
+// 단위(units) 관리는 app/inventory/actions.ts 및 염색약 관리 페이지로 통합되었습니다.

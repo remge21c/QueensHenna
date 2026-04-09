@@ -10,7 +10,7 @@ import {
   CloudArrowUp,
   Warning,
   CheckCircle,
-  SignOut
+  SignOut,
 } from '@phosphor-icons/react'
 import {
   getBackupData,
@@ -18,7 +18,7 @@ import {
   getTreatmentTypes,
   updateTreatmentType,
   createTreatmentType,
-  deleteTreatmentType
+  deleteTreatmentType,
 } from './actions'
 import { signOut } from '@/app/(auth)/actions'
 
@@ -33,9 +33,7 @@ export default function SettingsPage() {
   const [newTypePrice, setNewTypePrice] = useState(0)
 
   useEffect(() => {
-    if (activeTab === 'pricing') {
-      loadPricingData()
-    }
+    if (activeTab === 'pricing') loadPricingData()
   }, [activeTab])
 
   const loadPricingData = async () => {
@@ -51,11 +49,16 @@ export default function SettingsPage() {
   const handleCreateType = async () => {
     if (!newTypeName) return
     setLoading(true)
+    setStatus(null)
     const res = await createTreatmentType(newTypeName, newTypePrice)
     if (res.success) {
       setNewTypeName('')
       setNewTypePrice(0)
       await loadPricingData()
+      setStatus({ type: 'success', message: '시술 항목이 추가되었습니다.' })
+    } else {
+      console.error('createTreatmentType error:', res.error)
+      setStatus({ type: 'error', message: `저장 실패: ${res.error}` })
     }
     setLoading(false)
   }
@@ -63,10 +66,15 @@ export default function SettingsPage() {
   const handleUpdateType = async () => {
     if (!editingType) return
     setLoading(true)
-    const res = await updateTreatmentType(editingType.id, editingType.name, editingType.default_price)
+    setStatus(null)
+    const res = await updateTreatmentType(editingType.id, editingType.name, editingType.base_price)
     if (res.success) {
       setEditingType(null)
       await loadPricingData()
+      setStatus({ type: 'success', message: '수정되었습니다.' })
+    } else {
+      console.error('updateTreatmentType error:', res.error)
+      setStatus({ type: 'error', message: `저장 실패: ${res.error}` })
     }
     setLoading(false)
   }
@@ -251,6 +259,15 @@ export default function SettingsPage() {
                 </h2>
               </div>
 
+              {status && (
+                <div className={`p-4 rounded-xl flex items-center gap-3 text-sm font-medium ${
+                  status.type === 'success' ? 'bg-green-50 text-green-700 border border-green-100' : 'bg-error-container/20 text-error border border-error-container/30'
+                }`}>
+                  {status.type === 'success' ? <CheckCircle weight="fill" size={20} /> : <Warning weight="fill" size={20} />}
+                  {status.message}
+                </div>
+              )}
+
               {/* Add New Type */}
               <div className="p-6 bg-muted rounded-xl border border-border grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
                 <div className="space-y-2">
@@ -308,11 +325,11 @@ export default function SettingsPage() {
                           {editingType?.id === type.id ? (
                             <input
                               type="number"
-                              value={editingType.default_price}
-                              onChange={(e) => setEditingType({ ...editingType, default_price: Number(e.target.value) })}
+                              value={editingType.base_price}
+                              onChange={(e) => setEditingType({ ...editingType, base_price: Number(e.target.value) })}
                               className="w-24 px-2 py-1 border border-primary rounded text-right"
                             />
-                          ) : `${type.default_price.toLocaleString()}원`}
+                          ) : `${(type.base_price ?? 0).toLocaleString()}원`}
                         </td>
                         <td className="px-6 py-4 text-center">
                           <div className="flex justify-center gap-2">
