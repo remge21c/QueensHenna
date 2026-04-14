@@ -124,7 +124,7 @@ export default function CustomerRecipePanel({ customerId }: { customerId: string
       <div className="flex flex-col gap-2">
         {rows.length === 0 ? (
           <div className="py-8 text-center text-muted-foreground border border-dashed border-border rounded-xl text-sm">
-            <Drop size={24} weight="thin" className="mx-auto mb-2 opacity-40" />
+            <Drop size={24} weight="light" className="mx-auto mb-2 opacity-40" />
             등록된 기본 레시피가 없습니다.
           </div>
         ) : (

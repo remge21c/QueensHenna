@@ -1,6 +1,12 @@
+import type { Metadata } from "next"
 import React from "react";
 import { getCustomers } from "@/lib/api/customers";
 import CustomerTable from "@/components/customers/CustomerTable";
+
+export const metadata: Metadata = {
+  title: "고객 관리 | 퀸즈헤나",
+  description: "고객 정보 및 시술 이력 통합 관리",
+}
 import { 
   Users, 
   UserPlus, 

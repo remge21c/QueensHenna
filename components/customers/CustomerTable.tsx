@@ -4,6 +4,7 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import { Avatar } from "@/components/ui/Avatar";
 import { Badge } from "@/components/ui/Badge";
+import { StaggerTbody, StaggerTr } from "@/components/ui/StaggerList";
 import { format, formatDistanceToNow } from "date-fns";
 import { ko } from "date-fns/locale";
 
@@ -32,7 +33,7 @@ export default function CustomerTable({ customers }: { customers: Customer[] }) 
             <th className="text-left py-3 px-4">상태</th>
           </tr>
         </thead>
-        <tbody className="text-sm">
+        <StaggerTbody fast className="text-sm">
           {customers.length === 0 ? (
             <tr>
               <td colSpan={6} className="text-center py-10 text-muted-foreground">
@@ -47,7 +48,7 @@ export default function CustomerTable({ customers }: { customers: Customer[] }) 
               const status = primaryStock?.status || "정상";
 
               return (
-                <tr
+                <StaggerTr
                   key={customer.id}
                   className="border-b border-border hover:bg-muted/50 transition-colors cursor-pointer"
                   onClick={() => router.push(`/customers/${customer.id}`)}
@@ -86,11 +87,11 @@ export default function CustomerTable({ customers }: { customers: Customer[] }) 
                       {status}
                     </Badge>
                   </td>
-                </tr>
+                </StaggerTr>
               );
             })
           )}
-        </tbody>
+        </StaggerTbody>
       </table>
     </div>
   );

@@ -180,7 +180,7 @@ export default function DyeMasterPanel() {
             {dyeTypes.length === 0 ? (
               <tr>
                 <td colSpan={5} className="text-center py-16 text-muted-foreground">
-                  <Drop size={32} weight="thin" className="mx-auto mb-3 opacity-40" />
+                  <Drop size={32} weight="light" className="mx-auto mb-3 opacity-40" />
                   등록된 염색약이 없습니다.
                 </td>
               </tr>

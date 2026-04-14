@@ -1,7 +1,13 @@
+import type { Metadata } from "next"
 import React from "react"
 import { getInventory } from "@/lib/api/inventory"
 import InventoryTabs from "@/components/inventory/InventoryTabs"
 import { Drop, PlusCircle } from "@phosphor-icons/react/dist/ssr"
+
+export const metadata: Metadata = {
+  title: "염색약 관리 | 퀸즈헤나",
+  description: "고객별 염색약 잔여 현황 및 염색약 종류를 관리합니다",
+}
 
 export const dynamic = "force-dynamic"
 

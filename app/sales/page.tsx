@@ -74,7 +74,7 @@ export default function SalesPage() {
              <div className="flex justify-between items-start">
                <div className="z-10">
                  <p className="text-sm font-bold text-muted-foreground mb-2">{kpi.label}</p>
-                 <p className={`text-2xl font-black ${kpi.color}`}>{kpi.value}</p>
+                 <p className={`text-2xl font-black font-[family-name:var(--font-numeric)] tabular-nums ${kpi.color}`}>{kpi.value}</p>
                </div>
                <div className="p-3 bg-muted rounded-xl text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all">
                  <kpi.icon size={24} weight="bold" />

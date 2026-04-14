@@ -68,7 +68,7 @@ export default function InventoryTabs({ inventory }: InventoryTabsProps) {
             ) : (
               <div className="flex flex-col items-center justify-center py-24 gap-4 bg-background/30 rounded-xl border border-dashed border-border">
                 <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
-                  <Drop size={32} weight="thin" />
+                  <Drop size={32} weight="light" />
                 </div>
                 <div className="text-center">
                   <h3 className="font-bold text-foreground">데이터가 없습니다.</h3>

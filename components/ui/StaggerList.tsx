@@ -59,3 +59,26 @@ export function StaggerItem({ children, className }: { children: React.ReactNode
     </motion.div>
   )
 }
+
+/** 테이블 tbody 래퍼 */
+export function StaggerTbody({ children, className, fast = false }: StaggerListProps) {
+  return (
+    <motion.tbody
+      variants={fast ? containerVariantsFast : containerVariants}
+      initial="hidden"
+      animate="visible"
+      className={className}
+    >
+      {children}
+    </motion.tbody>
+  )
+}
+
+/** 테이블 tr 아이템 */
+export function StaggerTr({ children, className, onClick }: { children: React.ReactNode; className?: string; onClick?: () => void }) {
+  return (
+    <motion.tr variants={itemVariants} className={className} onClick={onClick}>
+      {children}
+    </motion.tr>
+  )
+}
