@@ -128,7 +128,7 @@ export default function SettingsPage() {
 
   return (
     <div className="animate-in fade-in duration-500">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 sticky top-0 z-20 bg-background -mx-4 px-4 pt-4 -mt-4 md:-mx-8 md:px-8 md:pt-8 md:-mt-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 md:sticky md:top-0 md:z-20 md:bg-background md:-mx-8 md:px-8 md:pt-8 md:-mt-8">
         <div>
           <h1 className="text-xl md:text-3xl font-black text-foreground tracking-tight">환경 설정</h1>
           <p className="text-muted-foreground mt-1">시스템 운영에 필요한 데이터와 환경을 관리합니다.</p>

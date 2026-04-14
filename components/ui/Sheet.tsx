@@ -12,6 +12,8 @@ interface SheetProps {
 }
 
 export default function Sheet({ isOpen, onClose, title, children, width = "max-w-2xl" }: SheetProps) {
+  const titleId = React.useId()
+
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden"
@@ -21,12 +23,27 @@ export default function Sheet({ isOpen, onClose, title, children, width = "max-w
     return () => { document.body.style.overflow = "" }
   }, [isOpen])
 
+  useEffect(() => {
+    if (!isOpen) return
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose()
+    }
+    document.addEventListener("keydown", handleKeyDown)
+    return () => document.removeEventListener("keydown", handleKeyDown)
+  }, [isOpen, onClose])
+
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={title ? titleId : undefined}
+      className="fixed inset-0 z-50 flex justify-end"
+    >
       {/* 오버레이 */}
       <div
+        aria-hidden="true"
         className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200"
         onClick={onClose}
       />
@@ -38,12 +55,13 @@ export default function Sheet({ isOpen, onClose, title, children, width = "max-w
         {/* 헤더 */}
         {title && (
           <div className="flex items-center justify-between px-6 py-4 border-b border-border shrink-0">
-            <h2 className="text-lg font-bold text-foreground">{title}</h2>
+            <h2 id={titleId} className="text-lg font-bold text-foreground">{title}</h2>
             <button
               onClick={onClose}
-              className="p-2 rounded-xl hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+              aria-label="닫기"
+              className="p-2 rounded-xl hover:bg-muted transition-colors text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
-              <X size={20} weight="bold" />
+              <X size={20} weight="bold" aria-hidden="true" />
             </button>
           </div>
         )}

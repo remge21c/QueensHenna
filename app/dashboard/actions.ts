@@ -10,12 +10,13 @@ export async function getDashboardStats() {
   const monthStart = startOfMonth(new Date()).toISOString()
   const monthEnd = endOfMonth(new Date()).toISOString()
 
-  // 1. 오늘의 예약 수
+  // 1. 오늘의 예약 수 (시술 대기 중인 것만)
   const { count: todayReservationsCount } = await supabase
     .from('reservations')
     .select('*', { count: 'exact', head: true })
     .gte('reserved_at', todayStart)
     .lte('reserved_at', todayEnd)
+    .eq('status', '예약')
 
   // 2. 오늘 매출
   const { data: todayTreatments } = await supabase
@@ -42,7 +43,7 @@ export async function getDashboardStats() {
     .gte('created_at', todayStart)
     .lte('created_at', todayEnd)
 
-  // 5. 오늘 예약 목록 (상세)
+  // 5. 오늘 시술 대기 목록 (예약 상태만)
   const { data: reservations } = await supabase
     .from('reservations')
     .select(`
@@ -57,6 +58,7 @@ export async function getDashboardStats() {
     `)
     .gte('reserved_at', todayStart)
     .lte('reserved_at', todayEnd)
+    .eq('status', '예약')
     .order('reserved_at', { ascending: true })
 
   // 6. 최근 시술 기록 (10개)

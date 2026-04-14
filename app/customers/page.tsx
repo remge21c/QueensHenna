@@ -17,7 +17,7 @@ export default async function CustomersPage() {
   return (
     <div className="flex flex-col gap-8 animate-in fade-in duration-500">
       {/* 헤더 */}
-      <header className="flex justify-between items-center pb-4 sticky top-0 z-20 bg-background -mx-4 px-4 pt-4 -mt-4 md:-mx-8 md:px-8 md:pt-8 md:-mt-8">
+      <header className="flex justify-between items-center pb-4 md:sticky md:top-0 md:z-20 md:bg-background md:-mx-8 md:px-8 md:pt-8 md:-mt-8">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary shadow-sm">
             <Users size={28} weight="fill" />

@@ -16,6 +16,6 @@ describe('DyePurchaseForm', () => {
 
     expect(screen.getByText(/고객 선택/)).toBeInTheDocument()
     expect(screen.getByText(/염색약 종류/)).toBeInTheDocument()
-    expect(screen.getByLabelText(/구매 수량/)).toBeInTheDocument()
+    expect(screen.getAllByText(/추가 용량/).length).toBeGreaterThanOrEqual(1)
   })
 })

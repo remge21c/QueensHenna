@@ -33,6 +33,7 @@ describe('Treatment Registration Actions', () => {
       80000,
       '카드',
       '메모내용',
+      '2026-04-14T10:00:00.000Z',
       [{ dye_id: 'dye-id', unit_id: 'unit-id', amount: 50 }]
     )
 
@@ -57,6 +58,7 @@ describe('Treatment Registration Actions', () => {
       80000,
       '카드',
       '',
+      '2026-04-14T10:00:00.000Z',
       []
     )
 

@@ -16,10 +16,10 @@ export default function KpiCard({ title, value, icon: Icon, variant = "primary" 
         <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-xl ${
           variant === "primary" ? "bg-primary/10 text-primary" : "bg-secondary/20 text-secondary"
         }`}>
-          <Icon size={20} weight="regular" />
+          <Icon size={20} weight="fill" />
         </div>
       </div>
-      <div className="text-2xl font-bold text-foreground">
+      <div className="text-2xl font-bold text-foreground font-[family-name:var(--font-numeric)] tabular-nums">
         {value}
       </div>
     </div>

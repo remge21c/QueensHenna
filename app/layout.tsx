@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import Sidebar from "@/components/layout/Sidebar";
+import PageTransition from "@/components/layout/PageTransition";
+import BottomNav from "@/components/layout/BottomNav";
 import "./globals.css";
-import { Public_Sans } from "next/font/google";
+import { Public_Sans, Montserrat } from "next/font/google";
 import { cn } from "@/lib/utils";
 
 const publicSans = Public_Sans({ subsets: ["latin"], variable: "--font-headline" });
+const montserrat = Montserrat({ subsets: ["latin"], variable: "--font-numeric", weight: ["400", "700", "800", "900"] });
 
 export const metadata: Metadata = {
   title: "퀸즈헤나 고객관리 시스템",
@@ -19,7 +22,7 @@ export default function RootLayout({
   return (
     <html
       lang="ko"
-      className={cn("h-full antialiased", "font-sans", publicSans.variable)}
+      className={cn("h-full antialiased", "font-sans", publicSans.variable, montserrat.variable)}
     >
       <head>
         <link
@@ -29,10 +32,19 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-row bg-background text-foreground font-sans m-0 p-0 overflow-hidden">
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-lg focus:font-bold focus:shadow-lg"
+        >
+          본문 바로가기
+        </a>
         <Sidebar />
-        <main className="flex-1 h-screen overflow-y-auto">
+        <BottomNav />
+        <main id="main-content" className="flex-1 h-screen overflow-y-auto pt-14 md:pt-0 pb-16 md:pb-0">
           <div className="max-w-[1200px] mx-auto px-4 py-4 md:px-8 md:py-8">
-            {children}
+            <PageTransition>
+              {children}
+            </PageTransition>
           </div>
         </main>
       </body>

@@ -1,4 +1,7 @@
+"use client";
+
 import React from "react";
+import { useRouter } from "next/navigation";
 import { Avatar } from "@/components/ui/Avatar";
 import { Badge } from "@/components/ui/Badge";
 import { format, formatDistanceToNow } from "date-fns";
@@ -14,6 +17,8 @@ interface Customer {
 }
 
 export default function CustomerTable({ customers }: { customers: Customer[] }) {
+  const router = useRouter();
+
   return (
     <div className="overflow-x-auto w-full">
       <table className="w-full border-collapse">
@@ -45,6 +50,7 @@ export default function CustomerTable({ customers }: { customers: Customer[] }) 
                 <tr
                   key={customer.id}
                   className="border-b border-border hover:bg-muted/50 transition-colors cursor-pointer"
+                  onClick={() => router.push(`/customers/${customer.id}`)}
                 >
                   <td className="py-4 px-4 flex items-center gap-3">
                     <Avatar name={customer.name} className="w-9 h-9" />

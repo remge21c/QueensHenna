@@ -3,6 +3,129 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 
+export async function getTreatments() {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('treatments')
+    .select(`
+      id,
+      treated_at,
+      status,
+      total_price,
+      payment_method,
+      reservation_id,
+      customer_id,
+      customer:customers(name, phone),
+      type:treatment_types(name, base_price)
+    `)
+    .order('treated_at', { ascending: false })
+    .limit(50)
+
+  if (error) {
+    throw new Error(error.message)
+  }
+  return data
+}
+
+export async function completeTreatmentAction(
+  treatmentId: string,
+  reservationId: string | null,
+  totalPrice: number,
+  paymentMethod: string,
+  memo: string,
+  usages: { dye_id: string; unit_id: string; amount: number }[]
+) {
+  const supabase = await createClient()
+
+  // 1. 시술 기록 완료 처리 (treatmentId 없으면 예약에서 직접 생성)
+  let resolvedTreatmentId = treatmentId
+  if (!treatmentId && reservationId) {
+    const { data: reservation } = await supabase
+      .from('reservations')
+      .select('customer_id, treatment_type_id, reserved_at')
+      .eq('id', reservationId)
+      .single()
+    if (!reservation) return { success: false, error: '예약 정보를 찾을 수 없습니다.' }
+    const { data: newTreatment, error: insertError } = await supabase
+      .from('treatments')
+      .insert({
+        customer_id: reservation.customer_id,
+        treatment_type_id: reservation.treatment_type_id,
+        reservation_id: reservationId,
+        treated_at: reservation.reserved_at,
+        status: 'completed',
+        total_price: totalPrice,
+        payment_method: paymentMethod,
+        memo,
+      })
+      .select('id')
+      .single()
+    if (insertError) return { success: false, error: insertError.message }
+    resolvedTreatmentId = newTreatment.id
+  } else {
+    const { error: updateError } = await supabase
+      .from('treatments')
+      .update({ status: 'completed', total_price: totalPrice, payment_method: paymentMethod, memo })
+      .eq('id', treatmentId)
+    if (updateError) return { success: false, error: updateError.message }
+  }
+
+  // 2. 사용량 기록
+  if (usages.length > 0) {
+    const usageRows = usages.map(u => ({
+      treatment_id: resolvedTreatmentId,
+      dye_id: u.dye_id,
+      unit_id: u.unit_id,
+      amount: u.amount,
+    }))
+    const { error: usageError } = await supabase.from('treatment_usage').insert(usageRows)
+    if (usageError) console.error('treatment_usage insert error:', usageError)
+
+    // 3. 고객 염색약 잔량 차감
+    const { data: treatmentData } = await supabase
+      .from('treatments')
+      .select('customer_id')
+      .eq('id', resolvedTreatmentId)
+      .single()
+
+    if (treatmentData?.customer_id) {
+      for (const u of usages) {
+        const { data: stock } = await supabase
+          .from('customer_dye_stocks')
+          .select('id, current_amount')
+          .eq('customer_id', treatmentData.customer_id)
+          .eq('dye_id', u.dye_id)
+          .single()
+
+        if (stock) {
+          const newAmount = Math.max(0, Number(stock.current_amount) - Number(u.amount))
+          const status = newAmount <= 0 ? '소진' : newAmount < 50 ? '주의' : '정상'
+          await supabase
+            .from('customer_dye_stocks')
+            .update({ current_amount: newAmount, status })
+            .eq('id', stock.id)
+        }
+      }
+    }
+  }
+
+  // 4. 예약 상태 → 시술완료
+  if (reservationId) {
+    const { error: resError } = await supabase
+      .from('reservations')
+      .update({ status: '시술완료', updated_at: new Date().toISOString() })
+      .eq('id', reservationId)
+    if (resError) console.error('reservation update error:', resError)
+  }
+
+  revalidatePath('/treatments')
+  revalidatePath('/reservations')
+  revalidatePath('/customers')
+  revalidatePath('/sales')
+  revalidatePath('/')
+  return { success: true }
+}
+
 export async function getTreatmentTypes() {
   const supabase = await createClient()
   const { data, error } = await supabase.from('treatment_types').select('*').order('name')
@@ -48,16 +171,18 @@ export async function registerTreatmentAction(
   totalPrice: number,
   paymentMethod: string,
   memo: string,
+  treatedAt: string,
   usages: { dye_id: string; unit_id: string; amount: number }[]
 ) {
   const supabase = await createClient()
-  
+
   const { data, error } = await supabase.rpc('register_treatment', {
     p_customer_id: customerId,
     p_treatment_type_id: treatmentTypeId,
     p_total_price: totalPrice,
     p_payment_method: paymentMethod,
     p_memo: memo,
+    p_treated_at: treatedAt,
     p_usages: usages
   })
 

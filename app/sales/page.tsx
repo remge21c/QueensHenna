@@ -15,6 +15,7 @@ import {
 import { getSalesStats } from './actions'
 import { format } from 'date-fns'
 import { ko } from 'date-fns/locale'
+import { SkeletonSales } from '@/components/ui/Skeleton'
 
 export default function SalesPage() {
   const [stats, setStats] = useState<any>(null)
@@ -31,14 +32,7 @@ export default function SalesPage() {
     loadStats()
   }, [targetMonth])
 
-  if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[80vh] gap-4">
-        <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
-        <p className="text-muted-foreground font-medium">매출 정보를 분석하는 중...</p>
-      </div>
-    )
-  }
+  if (loading) return <SkeletonSales />
 
   const kpis = [
     { label: '총 매출금액', value: `${stats.totalRevenue.toLocaleString()}원`, icon: CurrencyKrw, color: 'text-primary' },
@@ -51,7 +45,7 @@ export default function SalesPage() {
 
   return (
     <div className="animate-in fade-in duration-500">
-      <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 sticky top-0 z-20 bg-background -mx-4 px-4 pt-4 -mt-4 md:-mx-8 md:px-8 md:pt-8 md:-mt-8">
+      <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 md:sticky md:top-0 md:z-20 md:bg-background md:-mx-8 md:px-8 md:pt-8 md:-mt-8">
         <div>
           <h1 className="text-xl md:text-3xl font-black text-foreground tracking-tight flex items-center gap-2">
             매출 통계
@@ -95,7 +89,7 @@ export default function SalesPage() {
       </div>
 
       {/* Mini Visual Chart (CSS-based) */}
-      <section className="bg-card rounded-xl border border-border p-4 md:p-10card-shadow mb-10 overflow-hidden relative">
+      <section className="bg-card rounded-xl border border-border p-4 md:p-10 card-shadow mb-10 overflow-hidden relative">
          <div className="flex justify-between items-center mb-10">
             <h2 className="text-xl font-black text-foreground flex items-center gap-3">
               <Selection size={28} weight="fill" className="text-primary" />
@@ -142,7 +136,7 @@ export default function SalesPage() {
       </section>
 
       {/* Detailed Table */}
-      <section className="bg-card rounded-xl border border-border p-4 md:p-10card-shadow">
+      <section className="bg-card rounded-xl border border-border p-4 md:p-10 card-shadow">
         <h2 className="text-xl font-black text-foreground mb-8">매출 상세 내역</h2>
         <div className="overflow-x-auto">
           <table className="w-full">

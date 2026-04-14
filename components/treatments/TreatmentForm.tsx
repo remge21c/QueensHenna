@@ -48,6 +48,10 @@ export default function TreatmentForm({ onSuccess, onCancel }: TreatmentFormProp
   const [additionalPrice, setAdditionalPrice] = useState(0)
   const [paymentMethod, setPaymentMethod] = useState('카드')
   const [memo, setMemo] = useState('')
+  const [treatedAt, setTreatedAt] = useState(() => {
+    const now = new Date()
+    return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}T${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`
+  })
 
   const [usages, setUsages] = useState<any[]>([
     { dye_id: '', unit_id: '', amount: 0 }
@@ -159,7 +163,7 @@ export default function TreatmentForm({ onSuccess, onCancel }: TreatmentFormProp
   }
 
   const calculateTotalPrice = () => {
-    const basePrice = treatmentTypes.find(t => t.id === selectedType)?.default_price || 0
+    const basePrice = treatmentTypes.find(t => t.id === selectedType)?.base_price || 0
     return basePrice + Number(additionalPrice)
   }
 
@@ -177,6 +181,7 @@ export default function TreatmentForm({ onSuccess, onCancel }: TreatmentFormProp
         calculateTotalPrice(),
         paymentMethod,
         memo,
+        new Date(treatedAt).toISOString(),
         usages.filter(u => u.dye_id && u.amount > 0)
       )
       if (result.success) {
@@ -306,6 +311,17 @@ export default function TreatmentForm({ onSuccess, onCancel }: TreatmentFormProp
                 </div>
               </div>
 
+              {/* 시술 일시 */}
+              <div className="space-y-3">
+                <label className="text-sm font-bold text-primary">시술 일시</label>
+                <input
+                  type="datetime-local"
+                  value={treatedAt}
+                  onChange={(e) => setTreatedAt(e.target.value)}
+                  className="w-full h-12 px-4 bg-card border border-border rounded-xl focus:outline-none focus:border-primary text-sm"
+                />
+              </div>
+
               {/* Pricing */}
               <div className="p-6 bg-card border border-border rounded-xl space-y-4">
                 <div className="flex items-center gap-2 text-primary font-bold text-sm border-b border-border/50 pb-3 mb-4">
@@ -316,7 +332,7 @@ export default function TreatmentForm({ onSuccess, onCancel }: TreatmentFormProp
                   <div className="space-y-2">
                     <label className="text-xs text-outline-variant font-medium">기본 금액</label>
                     <div className="text-xl font-bold text-foreground">
-                      {(treatmentTypes.find(t => t.id === selectedType)?.default_price || 0).toLocaleString()}
+                      {(treatmentTypes.find(t => t.id === selectedType)?.base_price || 0).toLocaleString()}
                       <span className="text-xs ml-1 font-normal text-outline-variant">원</span>
                     </div>
                   </div>
@@ -400,13 +416,13 @@ export default function TreatmentForm({ onSuccess, onCancel }: TreatmentFormProp
                   </div>
                 )}
 
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {usages.map((usage, index) => (
-                    <div key={index} className="flex gap-2 items-center group">
+                    <div key={index} className="flex gap-2 items-center">
                       <select
                         value={usage.dye_id}
                         onChange={(e) => handleUsageChange(index, 'dye_id', e.target.value)}
-                        className="flex-[2] h-10 px-2 bg-muted border border-border rounded-lg text-xs focus:outline-none focus:border-primary"
+                        className="flex-1 min-w-0 h-10 px-2 bg-muted border border-border rounded-lg text-xs focus:outline-none focus:border-primary"
                       >
                         <option value="">염색약 선택</option>
                         {dyeTypes.map(d => (
@@ -417,12 +433,12 @@ export default function TreatmentForm({ onSuccess, onCancel }: TreatmentFormProp
                         type="number"
                         value={usage.amount}
                         onChange={(e) => handleUsageChange(index, 'amount', Number(e.target.value))}
-                        className="flex-1 h-10 px-2 bg-muted border border-border rounded-lg text-xs text-right focus:outline-none focus:border-primary"
+                        className="w-16 h-10 px-2 bg-muted border border-border rounded-lg text-xs text-right focus:outline-none focus:border-primary"
                       />
                       <select
                         value={usage.unit_id}
                         onChange={(e) => handleUsageChange(index, 'unit_id', e.target.value)}
-                        className="flex-1 h-10 px-1 bg-muted border border-border rounded-lg text-[11px] focus:outline-none focus:border-primary"
+                        className="w-16 h-10 px-1 bg-muted border border-border rounded-lg text-xs focus:outline-none focus:border-primary"
                       >
                         {units.map(u => (
                           <option key={u.id} value={u.id}>{u.name}</option>
@@ -431,7 +447,7 @@ export default function TreatmentForm({ onSuccess, onCancel }: TreatmentFormProp
                       <button
                         type="button"
                         onClick={() => handleRemoveUsage(index)}
-                        className="p-1 text-outline-variant hover:text-error transition-colors"
+                        className="p-1 text-outline-variant hover:text-error transition-colors shrink-0"
                       >
                         <Trash size={18} />
                       </button>

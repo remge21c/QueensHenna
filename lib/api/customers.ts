@@ -1,7 +1,7 @@
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/supabase/server'
 
 export async function getCustomers() {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   // 고객 목록과 함께 최근 1개의 시술 기록과 모든 염색약 잔량 정보를 가져옴
   const { data, error } = await supabase
@@ -43,7 +43,7 @@ export async function getCustomers() {
 }
 
 export async function getCustomerDetail(id: string) {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   const { data, error } = await supabase
     .from('customers')

@@ -16,9 +16,92 @@ import {
   CalendarBlank,
   MegaphoneSimple
 } from '@phosphor-icons/react'
+import Link from 'next/link'
 import { getDashboardStats } from './dashboard/actions'
 import { format } from 'date-fns'
 import { ko } from 'date-fns/locale'
+import { SkeletonDashboard } from '@/components/ui/Skeleton'
+import { useTiltEffect } from '@/hooks/useTiltEffect'
+import { useCountUp } from '@/hooks/useCountUp'
+import { parseKpiValue } from '@/lib/parseKpiValue'
+import { motion } from 'framer-motion'
+
+interface KpiItem {
+  label: string
+  value: string
+  icon: any
+  color: string
+  variant?: 'default' | 'featured' | 'compact'
+  colSpan?: string
+}
+
+function KpiTiltCard({ kpi }: { kpi: KpiItem }) {
+  const { ref, handlers } = useTiltEffect(kpi.variant === 'featured' ? 5 : 7)
+  const Icon = kpi.icon
+  const { numeric, prefix, suffix } = parseKpiValue(kpi.value)
+  const count = useCountUp(numeric)
+
+  if (kpi.variant === 'compact') {
+    return (
+      <div
+        ref={ref}
+        {...handlers}
+        className={`tilt-card bg-card px-5 py-4 md:px-8 rounded-xl border border-border card-shadow hover:shadow-md hover:border-primary/20 transition-all group overflow-hidden relative cursor-default flex items-center gap-4 md:gap-8 ${kpi.colSpan ?? ''}`}
+      >
+        <div className={`p-3 rounded-xl bg-${kpi.color}-container text-on-${kpi.color}-container flex-shrink-0`}>
+          <Icon size={22} weight="fill" />
+        </div>
+        <div>
+          <div className="text-xs font-bold text-muted-foreground mb-0.5">{kpi.label}</div>
+          <div className="text-xl md:text-2xl font-black text-foreground font-[family-name:var(--font-numeric)] tabular-nums" aria-label={`${kpi.label}: ${kpi.value}`}>
+            {prefix}<motion.span>{count}</motion.span>{suffix}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (kpi.variant === 'featured') {
+    return (
+      <div
+        ref={ref}
+        {...handlers}
+        className={`tilt-card bg-gradient-to-br from-primary-container to-secondary-container p-5 md:p-8 rounded-xl border border-primary/20 card-shadow hover:shadow-lg transition-all group overflow-hidden relative cursor-default ${kpi.colSpan ?? ''}`}
+      >
+        <div className="absolute -right-6 -bottom-6 w-32 h-32 rounded-full bg-primary/5 group-hover:scale-125 transition-transform" />
+        <div className="flex justify-between items-start mb-4 md:mb-6 relative z-10">
+          <span className="text-sm font-black text-on-primary-container/70 uppercase tracking-wider">{kpi.label}</span>
+          <div className="p-3 rounded-xl bg-primary/10 text-primary">
+            <Icon size={24} weight="fill" />
+          </div>
+        </div>
+        <div className="text-2xl md:text-4xl font-black text-on-primary-container font-[family-name:var(--font-numeric)] tabular-nums relative z-10" aria-label={`${kpi.label}: ${kpi.value}`}>
+          {prefix}<motion.span>{count}</motion.span>{suffix}
+        </div>
+        <div className="mt-2 text-xs text-on-primary-container/50 font-bold relative z-10">이번 달 누적</div>
+      </div>
+    )
+  }
+
+  return (
+    <div
+      ref={ref}
+      {...handlers}
+      className={`tilt-card bg-card p-4 md:p-8 rounded-xl border border-border card-shadow hover:shadow-lg hover:border-primary/20 transition-all group overflow-hidden relative cursor-default ${kpi.colSpan ?? ''}`}
+    >
+      <div className={`absolute -right-4 -top-4 w-24 h-24 rounded-full opacity-[0.03] group-hover:scale-150 transition-transform bg-${kpi.color}`} />
+      <div className="flex justify-between items-start mb-4 relative z-10">
+        <span className="text-sm font-bold text-muted-foreground">{kpi.label}</span>
+        <div className={`p-3 rounded-xl bg-${kpi.color}-container text-on-${kpi.color}-container`}>
+          <Icon size={24} weight="fill" />
+        </div>
+      </div>
+      <div className="text-xl md:text-3xl font-black text-foreground font-[family-name:var(--font-numeric)] tabular-nums relative z-10" aria-label={`${kpi.label}: ${kpi.value}`}>
+        {prefix}<motion.span>{count}</motion.span>{suffix}
+      </div>
+    </div>
+  )
+}
 
 export default function DashboardPage() {
   const [stats, setStats] = useState<any>(null)
@@ -33,25 +116,18 @@ export default function DashboardPage() {
     loadStats()
   }, [])
 
-  if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[80vh] gap-4">
-        <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
-        <p className="text-muted-foreground font-medium animate-pulse">데이터를 불러오는 중...</p>
-      </div>
-    )
-  }
+  if (loading) return <SkeletonDashboard />
 
-  const kpis = [
+  const kpis: KpiItem[] = [
+    { label: '이번 달 누적 매출', value: `${stats.monthSales.toLocaleString()}원`, icon: ChartBar, color: 'secondary', variant: 'featured', colSpan: 'col-span-2' },
     { label: '오늘의 예약', value: `${stats.todayReservationsCount}명`, icon: CalendarStar, color: 'primary' },
     { label: '오늘 매출', value: `${stats.todaySales.toLocaleString()}원`, icon: CurrencyKrw, color: 'tertiary' },
-    { label: '이번 달 누적 매출', value: `${stats.monthSales.toLocaleString()}원`, icon: ChartBar, color: 'secondary' },
-    { label: '오늘 신규 고객', value: `${stats.todayNewCustomers}명`, icon: UserPlus, color: 'primary' }
+    { label: '오늘 신규 고객', value: `${stats.todayNewCustomers}명`, icon: UserPlus, color: 'primary', variant: 'compact', colSpan: 'col-span-2 md:col-span-4' },
   ]
 
   return (
     <div className="animate-in fade-in duration-700">
-      <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 sticky top-0 z-20 bg-background -mx-4 px-4 pt-4 -mt-4 md:-mx-8 md:px-8 md:pt-8 md:-mt-8">
+      <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 md:sticky md:top-0 md:z-20 md:bg-background md:-mx-8 md:px-8 md:pt-8 md:-mt-8">
         <div>
           <h1 className="text-xl md:text-3xl font-black text-foreground tracking-tight flex items-center gap-2">
             대시보드
@@ -70,39 +146,37 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-10">
+      <section aria-label="핵심 지표" className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6 md:mb-10">
         {kpis.map((kpi, idx) => (
-          <div key={idx} className="bg-card p-4 md:p-8 rounded-xl border border-border card-shadow hover:shadow-lg hover:border-primary/20 transition-all group overflow-hidden relative">
-            <div className={`absolute -right-4 -top-4 w-24 h-24 rounded-full opacity-[0.03] group-hover:scale-150 transition-transform bg-${kpi.color}`} />
-            <div className="flex justify-between items-start mb-4">
-              <span className="text-sm font-bold text-muted-foreground">{kpi.label}</span>
-              <div className={`p-3 rounded-xl bg-${kpi.color}-container text-on-${kpi.color}-container`}>
-                <kpi.icon size={24} weight="bold" />
-              </div>
-            </div>
-            <div className="text-xl md:text-3xl font-black text-foreground">{kpi.value}</div>
-          </div>
+          <KpiTiltCard key={idx} kpi={kpi} />
         ))}
-      </div>
+      </section>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <div className="lg:col-span-8 flex flex-col gap-8">
           {/* Today's Reservations */}
-          <section className="bg-card rounded-xl border border-border p-5 md:p-10card-shadow relative overflow-hidden">
+          <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
+            className="bg-card rounded-xl border border-border p-5 md:p-10 card-shadow relative overflow-hidden"
+          >
             <div className="flex justify-between items-center mb-8">
               <h2 className="text-xl font-black text-foreground flex items-center gap-3">
                 <ClockCounterClockwise size={28} weight="fill" className="text-primary" />
-                오늘 예약 현황
+                오늘 시술 대기
               </h2>
-              <button className="text-primary font-bold text-sm flex items-center gap-1 hover:underline">
+              <Link href="/reservations" className="text-primary font-bold text-sm flex items-center gap-1 hover:underline">
                 전체보기 <CaretRight weight="bold" />
-              </button>
+              </Link>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full">
+                <caption className="sr-only">오늘 시술 대기 목록</caption>
                 <thead>
                   <tr className="text-left border-b border-border">
-                    <th className="pb-4 font-bold text-muted-foreground text-xs uppercase tracking-widest pl-2">시간</th>
+                    <th className="pb-4 font-bold text-muted-foreground text-xs uppercase tracking-widest pl-2">일시</th>
                     <th className="pb-4 font-bold text-muted-foreground text-xs uppercase tracking-widest">고객 정보</th>
                     <th className="pb-4 font-bold text-muted-foreground text-xs uppercase tracking-widest text-center">상태</th>
                     <th className="pb-4 font-bold text-muted-foreground text-xs uppercase tracking-widest">메모</th>
@@ -117,7 +191,8 @@ export default function DashboardPage() {
                   ) : stats.reservations.map((res: any) => (
                     <tr key={res.id} className="group hover:bg-muted/50 transition-colors">
                       <td className="py-6 pl-2">
-                        <span className="font-black text-primary text-lg">{format(new Date(res.reservation_time), 'HH:mm')}</span>
+                        <div className="font-black text-primary text-lg">{format(new Date(res.reservation_time), 'HH:mm')}</div>
+                        <div className="text-xs text-muted-foreground">{format(new Date(res.reservation_time), 'MM/dd (EEE)', { locale: ko })}</div>
                       </td>
                       <td className="py-6">
                         <div className="font-black text-foreground">{res.customers.name}</div>
@@ -125,8 +200,8 @@ export default function DashboardPage() {
                       </td>
                       <td className="py-6 text-center">
                         <span className={`px-4 py-1.5 rounded-full text-xs font-black tracking-tight ${
-                          res.status === '방문완료' ? 'bg-primary-container text-on-primary-container' :
-                          res.status === '예약완료' ? 'bg-tertiary-container text-on-tertiary-container' :
+                          res.status === '시술완료' ? 'bg-primary-container text-on-primary-container' :
+                          res.status === '예약' ? 'bg-tertiary-container text-on-tertiary-container' :
                           res.status === '노쇼' ? 'bg-error-container/30 text-error' : 'bg-surface-container text-muted-foreground'
                         }`}>
                           {res.status}
@@ -136,17 +211,23 @@ export default function DashboardPage() {
                         <p className="text-sm text-muted-foreground line-clamp-1 max-w-[200px]">{res.memo || '-'}</p>
                       </td>
                       <td className="py-6 text-right pr-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button className="text-muted-foreground hover:text-foreground transition-colors"><DotsThreeVertical size={24} weight="bold" /></button>
+                        <button aria-label="옵션 메뉴 열기" className="text-muted-foreground hover:text-foreground transition-colors"><DotsThreeVertical size={24} weight="bold" /></button>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-          </section>
+          </motion.section>
 
           {/* Recent Records */}
-          <section className="bg-card rounded-xl border border-border p-5 md:p-10card-shadow">
+          <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 0.5, ease: 'easeOut', delay: 0.1 }}
+            className="bg-card rounded-xl border border-border p-5 md:p-10 card-shadow"
+          >
             <div className="flex justify-between items-center mb-8">
               <h2 className="text-xl font-black text-foreground flex items-center gap-3">
                 <CheckCircle size={28} weight="fill" className="text-primary" />
@@ -177,12 +258,18 @@ export default function DashboardPage() {
                 </div>
               ))}
             </div>
-          </section>
+          </motion.section>
         </div>
 
         <div className="lg:col-span-4 flex flex-col gap-8">
           {/* Low Stock Alerts */}
-          <section className="bg-card rounded-xl border border-border p-8 card-shadow">
+          <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 0.5, ease: 'easeOut', delay: 0.15 }}
+            className="bg-card rounded-xl border border-border p-8 card-shadow"
+          >
             <div className="flex items-center gap-2 mb-6">
               <WarningCircle size={24} weight="fill" className="text-error" />
               <h2 className="text-lg font-black text-foreground">염색약 소진 임박</h2>
@@ -198,17 +285,23 @@ export default function DashboardPage() {
                     </div>
                   </div>
                   <div className="flex gap-1">
-                    <button className="p-2 rounded-xl bg-card text-primary hover:bg-primary hover:text-primary-foreground transition-all card-shadow border border-border"><ChatText size={18} weight="fill" /></button>
-                    <button className="p-2 rounded-xl bg-card text-primary hover:bg-primary hover:text-primary-foreground transition-all card-shadow border border-border"><PhoneCall size={18} weight="fill" /></button>
+                    <button aria-label="문자 발송" className="p-2 rounded-xl bg-card text-primary hover:bg-primary hover:text-primary-foreground transition-all card-shadow border border-border"><ChatText size={18} weight="fill" /></button>
+                    <button aria-label="전화 연결" className="p-2 rounded-xl bg-card text-primary hover:bg-primary hover:text-primary-foreground transition-all card-shadow border border-border"><PhoneCall size={18} weight="fill" /></button>
                   </div>
                 </div>
               ))}
               {stats.lowStockCustomers.length === 0 && <p className="text-center py-6 text-sm text-outline-variant">관리 대상 고객이 없습니다.</p>}
             </div>
-          </section>
+          </motion.section>
 
           {/* Retention Advice */}
-          <section className="bg-card rounded-xl border border-border p-8 card-shadow">
+          <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 0.5, ease: 'easeOut', delay: 0.2 }}
+            className="bg-card rounded-xl border border-border p-8 card-shadow"
+          >
             <div className="flex items-center gap-2 mb-6">
               <CalendarBlank size={24} weight="fill" className="text-tertiary" />
               <h2 className="text-lg font-black text-foreground">재방문 안내 권장</h2>
@@ -230,7 +323,7 @@ export default function DashboardPage() {
                  </div>
                ))}
             </div>
-          </section>
+          </motion.section>
         </div>
       </div>
     </div>

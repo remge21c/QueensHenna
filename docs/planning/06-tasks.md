@@ -229,3 +229,131 @@ graph TD
 | T6.1 (Settings UI) | 가능 | T0.2 완료 |
 
 **TASKS.md 업데이트가 완료되었습니다.**
+
+---
+
+## ──────────────────────────────────────────
+## 📌 Phase 8 — 안정화 & 고도화 (2026-04-14 역분석 추가)
+## ──────────────────────────────────────────
+> **역분석 기준일**: 2026-04-14
+> **현재 브랜치 상태**: 대규모 수정 커밋 미완료 (git status 참조)
+> **신규 컴포넌트**: CustomerRecipePanel, DyeMasterPanel, BottomNav, PageTransition, WeeklyView, TreatmentCompletionForm, Skeleton, StaggerList
+> **신규 훅**: useCountUp, useScrollGlass, useTiltEffect
+> **신규 마이그레이션**: 0004~0008 (로컬 파일 존재, Supabase 적용 여부 미확인)
+
+### [x] Phase 8, T8.1: Auth Middleware 복원 🔴 최우선
+**우선순위**: CRITICAL — `middleware.ts` 삭제로 라우트 보호 미작동
+**작업 내용**:
+- `middleware.ts` 재생성: Supabase SSR 세션 갱신 + 미인증 사용자 `/login` 리다이렉트
+- `lib/supabase/middleware.ts` 확인 후 연동
+**검증**:
+- 미로그인 상태에서 `/customers` 접근 시 `/login`으로 리다이렉트 확인
+**산출물**: `middleware.ts`
+
+### [ ] Phase 8, T8.2: 신규 DB 마이그레이션 Supabase 적용 🔴 최우선
+**우선순위**: HIGH — DyeMasterPanel, TreatmentCompletionForm 기능의 전제 조건
+**마이그레이션 목록 (순서 준수)**:
+1. `0004_update_dye_types_schema.sql` — dye_types에 `total_capacity`, `default_unit_id`, `is_active` 추가
+2. `0005_link_reservations_treatments.sql` — treatments에 `reservation_id`, `treatment_usage` 테이블
+3. `0006_rename_reservation_status.sql` — 예약 상태값 표준화
+4. `0007_fix_register_treatment_rpc.sql` — register_treatment RPC 갱신
+5. `0008_fix_status_criteria.sql` — 상태 기준 재정의
+**검증**:
+- Supabase 대시보드 또는 `npx supabase db push`로 적용 확인
+- `dye_types` 테이블에 `is_active` 컬럼 존재 확인
+**산출물**: Supabase DB 업데이트
+
+### [ ] Phase 8, T8.3: 테스트 커버리지 확장
+**우선순위**: MEDIUM
+
+#### T8.3.1: 예약 추가 테스트
+**TDD 사이클**:
+1. **RED**: `tests/reservations/WeeklyView.test.tsx` 작성 — 주간 뷰 렌더링, 날짜 이동
+2. **RED**: `tests/reservations/ReservationForm.test.tsx` 작성 — 고객 검색, 폼 제출
+3. **GREEN**: 테스트 통과 확인
+**산출물**: `tests/reservations/WeeklyView.test.tsx`, `tests/reservations/ReservationForm.test.tsx`
+
+#### T8.3.2: 시술 완료 처리 테스트
+**TDD 사이클**:
+1. **RED**: `tests/treatments/TreatmentCompletion.test.tsx` 작성 — 예약 선택, 사용량 입력, RPC 호출
+2. **GREEN**: `TreatmentCompletionForm` 연동 확인
+**산출물**: `tests/treatments/TreatmentCompletion.test.tsx`
+
+#### T8.3.3: 고객 레시피 패널 테스트
+**TDD 사이클**:
+1. **RED**: `tests/customers/CustomerRecipePanel.test.tsx` 작성 — 레시피 표시, 수정
+2. **GREEN**: `CustomerRecipePanel` 연동 확인
+**산출물**: `tests/customers/CustomerRecipePanel.test.tsx`
+
+#### T8.3.4: 재고 마스터 패널 테스트
+**TDD 사이클**:
+1. **RED**: `tests/inventory/DyeMaster.test.tsx` 작성 — 염색약 CRUD, is_active 토글
+2. **GREEN**: `DyeMasterPanel` 연동 확인
+**산출물**: `tests/inventory/DyeMaster.test.tsx`
+
+### [x] Phase 8, T8.4: 접근성 개선
+**우선순위**: MEDIUM
+**작업 내용**:
+- 모든 아이콘 버튼에 `aria-label` 추가 (Sidebar, BottomNav, 각 액션 버튼)
+- `<main>`, `<nav>`, `<section>` 시멘틱 마크업 적용
+- 포커스 링 스타일 개선 (`focus-visible:ring-2 focus-visible:ring-primary`)
+- Sheet/모달 ESC 닫기, 탭 순서 최적화
+**산출물**: 각 layout/ui 컴포넌트 업데이트
+
+### [ ] Phase 8, T8.5: 디자인 고도화 (기획.md 10가지 항목)
+**우선순위**: LOW — 기능 안정화 후 진행
+**참조**: `docs/디자인개선 기획.md`
+**작업 내용**:
+- [ ] ① 아이콘 두께 `weight="bold"` 일관 적용, 인터랙션 색상 전환
+- [ ] ② 숫자 데이터에 Montserrat/Inter 혼용 (`font-feature-settings: "tnum"`)
+- [ ] ③ Framer Motion StaggerList — 이미 구현됨, 누락 페이지에 추가 적용
+- [ ] ④ Glassmorphism — 이미 구현됨, 모든 sticky 헤더에 일관 적용
+- [ ] ⑤ 비대칭 Bento Grid — 대시보드 KPI 레이아웃 col-span 최적화
+- [ ] ⑥ Skeleton UI — 누락 페이지(고객 상세, 재고) 추가 적용
+- [ ] ⑦ 3D Tilt & Spotlight — KpiCard 외 다른 카드에도 확장
+- [ ] ⑧ Counting Animation — 이미 구현됨 (useCountUp)
+- [ ] ⑨ 모바일 BottomNav — 이미 구현됨, 활성 탭 표시 정확도 확인
+- [ ] ⑩ SEO 메타데이터 — 각 page.tsx에 `metadata` export 추가
+**산출물**: 각 컴포넌트 업데이트
+
+---
+
+## Phase 9 — 배포 준비
+
+### [ ] Phase 9, T9.1: 환경변수 검증 및 빌드 통과
+**작업 내용**:
+- `.env.local` 필수 키 확인: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `npm run build` 오류 0개 달성
+- `npm run test` 전체 통과
+**커맨드**:
+```bash
+npm run test && npm run build && npm run lint
+```
+**산출물**: 빌드 성공 및 테스트 그린
+
+---
+
+## Phase 8~9 의존성 그래프
+
+```
+T8.1 (Auth Middleware) ← 즉시 작업
+T8.2 (DB Migration)   ← 즉시 작업 (T8.1과 병렬 가능)
+  ↓
+T8.3 (테스트) ← T8.1, T8.2 완료 후
+T8.4 (접근성) ← T8.3과 병렬 가능
+  ↓
+T8.5 (디자인 고도화)
+  ↓
+T9.1 (배포 준비)
+```
+
+## 현재 권장 작업 순서
+
+| 순위 | 태스크 | 이유 |
+|------|--------|------|
+| 1 | T8.1 Auth Middleware 복원 | 보안 — 모든 라우트 무보호 |
+| 2 | T8.2 DB 마이그레이션 적용 | DyeMaster/시술완료 기능 전제 |
+| 3 | T8.3 테스트 작성 | 안정성 + TDD 원칙 |
+| 4 | T8.4 접근성 | 사용성 |
+| 5 | T8.5 디자인 고도화 | 프리미엄 UX |
+| 6 | T9.1 배포 준비 | 릴리스 |

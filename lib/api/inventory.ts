@@ -1,7 +1,7 @@
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/supabase/server'
 
 export async function getInventory() {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   // 고객별 염색약 잔량(customer_dye_stocks) 조회 및 레시피(customer_recipes) 조인
   const { data, error } = await supabase

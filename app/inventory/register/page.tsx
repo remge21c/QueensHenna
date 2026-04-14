@@ -1,16 +1,30 @@
 import React from "react"
 import { createClient } from "@/lib/supabase/server"
 import DyePurchaseForm from "@/components/inventory/DyePurchaseForm"
-import { createDyePurchase } from "@/app/inventory/actions"
+import { createBatchDyePurchase } from "@/app/inventory/actions"
 import Link from "next/link"
 import { CaretLeft, PlusCircle } from "@phosphor-icons/react/dist/ssr"
 
-export default async function RegisterPurchasePage() {
+export default async function RegisterPurchasePage({ searchParams }: { searchParams: Promise<{ customer_id?: string }> }) {
+  const { customer_id } = await searchParams
   const supabase = await createClient()
 
   const { data: customers } = await supabase.from("customers").select("id, name, phone").order("name")
-  const { data: dyeTypes } = await supabase.from("dye_types").select("*").order("name")
+  const { data: dyeTypes } = await supabase
+    .from("dye_types")
+    .select("id, name, total_capacity, default_unit_id, units:default_unit_id(name)")
+    .eq("is_active", true)
+    .order("name")
   const { data: units } = await supabase.from("units").select("*").order("name")
+
+  let existingStocks: { dye_id: string; current_amount: number; unit_id: string }[] = []
+  if (customer_id) {
+    const { data } = await supabase
+      .from("customer_dye_stocks")
+      .select("dye_id, current_amount, unit_id")
+      .eq("customer_id", customer_id)
+    existingStocks = data || []
+  }
 
   return (
     <div className="flex flex-col gap-8 animate-in fade-in duration-500 pb-12">
@@ -36,11 +50,13 @@ export default async function RegisterPurchasePage() {
 
       {/* 메인 폼 카드 */}
       <div className="bg-card rounded-xl border border-border card-shadow p-8 max-w-3xl">
-        <DyePurchaseForm 
-          customers={customers || []} 
+        <DyePurchaseForm
+          customers={customers || []}
           dyeTypes={dyeTypes || []}
           units={units || []}
-          onSubmit={createDyePurchase}
+          defaultCustomerId={customer_id}
+          existingStocks={existingStocks}
+          onSubmit={createBatchDyePurchase}
         />
       </div>
 

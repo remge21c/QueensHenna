@@ -6,6 +6,7 @@ import React from 'react'
 const mockInventory = [
   {
     id: '1',
+    customer_id: 'c1',
     customer: { name: '김미영' },
     dye_type: { name: '내츄럴 브라운' },
     purchased_amount: 500,
@@ -17,6 +18,7 @@ const mockInventory = [
   },
   {
     id: '2',
+    customer_id: 'c2',
     customer: { name: '이현주' },
     dye_type: { name: '레드' },
     purchased_amount: 300,

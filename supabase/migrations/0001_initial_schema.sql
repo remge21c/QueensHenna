@@ -43,7 +43,7 @@ CREATE TABLE customer_dye_stocks (
 CREATE TABLE treatment_types (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name TEXT NOT NULL UNIQUE,
-    default_price INTEGER DEFAULT 0,
+    base_price INTEGER DEFAULT 0,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
@@ -73,4 +73,4 @@ CREATE TABLE customer_recipes (
 -- 샘플 데이터 입력 (초기 구성을 위함)
 INSERT INTO dye_types (name) VALUES ('내츄럴 브라운'), ('오렌지 헤나'), ('레드');
 INSERT INTO units (name) VALUES ('g'), ('ml');
-INSERT INTO treatment_types (name, default_price) VALUES ('전체 염색', 50000), ('뿌리 염색', 30000);
+INSERT INTO treatment_types (name, base_price) VALUES ('전체 염색', 50000), ('뿌리 염색', 30000) ON CONFLICT (name) DO NOTHING;

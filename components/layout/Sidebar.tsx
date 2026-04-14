@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   SquaresFour,
   Users,
@@ -34,6 +34,15 @@ export default function Sidebar() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
 
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMobileOpen(false);
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [mobileOpen]);
+
   const sidebarContent = (
     <>
       <div className="flex items-center gap-3 px-2 mb-4 mt-2">
@@ -46,7 +55,7 @@ export default function Sidebar() {
         </div>
       </div>
 
-      <nav className="flex-1">
+      <nav aria-label="주 메뉴" className="flex-1">
         <ul className="flex flex-col gap-1 list-none p-0 m-0">
           {navItems.map((item) => {
             const isActive = pathname === item.href;
@@ -81,8 +90,11 @@ export default function Sidebar() {
         >
           예약 등록
         </Link>
-        <button className="flex items-center gap-3 px-4 py-2 text-muted-foreground hover:text-error transition-colors w-full rounded-lg">
-          <SignOut size={18} />
+        <button
+          aria-label="로그아웃"
+          className="flex items-center gap-3 px-4 py-2 text-muted-foreground hover:text-error transition-colors w-full rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+        >
+          <SignOut size={18} aria-hidden="true" />
           <span className="text-sm font-medium">로그아웃</span>
         </button>
       </div>
@@ -92,7 +104,7 @@ export default function Sidebar() {
   return (
     <>
       {/* Mobile top bar */}
-      <div className="fixed top-0 left-0 right-0 z-40 flex md:hidden items-center justify-between bg-surface border-b border-border px-4 h-14">
+      <div className="fixed top-0 left-0 right-0 z-40 flex md:hidden items-center justify-between glass border-b border-border/60 px-4 h-14">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center text-primary-foreground shadow-sm">
             <Plant weight="fill" size={16} />
@@ -101,9 +113,12 @@ export default function Sidebar() {
         </div>
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="p-2 rounded-lg text-foreground hover:bg-surface-container transition-colors"
+          aria-label={mobileOpen ? "메뉴 닫기" : "메뉴 열기"}
+          aria-expanded={mobileOpen}
+          aria-controls="mobile-sidebar"
+          className="p-2 rounded-lg text-foreground hover:bg-surface-container transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
         >
-          {mobileOpen ? <X size={24} weight="bold" /> : <List size={24} weight="bold" />}
+          {mobileOpen ? <X size={24} weight="bold" aria-hidden="true" /> : <List size={24} weight="bold" aria-hidden="true" />}
         </button>
       </div>
 
@@ -113,6 +128,7 @@ export default function Sidebar() {
       {/* Mobile overlay */}
       {mobileOpen && (
         <div
+          aria-hidden="true"
           className="fixed inset-0 z-40 bg-black/40 md:hidden"
           onClick={() => setMobileOpen(false)}
         />
@@ -120,6 +136,8 @@ export default function Sidebar() {
 
       {/* Mobile drawer */}
       <aside
+        id="mobile-sidebar"
+        aria-label="모바일 메뉴"
         className={cn(
           "fixed top-0 left-0 z-50 w-72 h-screen bg-surface border-r border-border p-6 flex flex-col gap-8 transition-transform duration-300 md:hidden",
           mobileOpen ? "translate-x-0" : "-translate-x-full"
@@ -127,9 +145,10 @@ export default function Sidebar() {
       >
         <button
           onClick={() => setMobileOpen(false)}
-          className="absolute top-4 right-4 p-1 rounded-lg text-muted-foreground hover:text-foreground"
+          aria-label="메뉴 닫기"
+          className="absolute top-4 right-4 p-1 rounded-lg text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
         >
-          <X size={20} weight="bold" />
+          <X size={20} weight="bold" aria-hidden="true" />
         </button>
         {sidebarContent}
       </aside>
