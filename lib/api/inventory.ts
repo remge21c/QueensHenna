@@ -3,36 +3,47 @@ import { createClient } from '@/lib/supabase/server'
 export async function getInventory() {
   const supabase = await createClient()
 
-  // 고객별 염색약 잔량(customer_dye_stocks) 조회 및 레시피(customer_recipes) 조인
-  const { data, error } = await supabase
-    .from('customer_dye_stocks')
-    .select(`
-      *,
-      customers(name),
-      dye_types(name),
-      units(name)
-    `)
-    .order('created_at', { ascending: false })
+  // 재고 + 레시피를 2번의 쿼리로 처리 (기존 N+1 → 2 queries)
+  const [stocksResult, recipesResult] = await Promise.all([
+    supabase
+      .from('customer_dye_stocks')
+      .select(`
+        id,
+        customer_id,
+        dye_id,
+        current_amount,
+        status,
+        created_at,
+        customers(name),
+        dye_types(name),
+        units(name)
+      `)
+      .order('created_at', { ascending: false }),
 
-  if (error) {
-    console.error('Error fetching inventory:', error)
+    supabase
+      .from('customer_recipes')
+      .select('customer_id, dye_id, default_use_amount'),
+  ])
+
+  if (stocksResult.error) {
+    console.error('Error fetching inventory:', stocksResult.error)
     return []
   }
 
-  // 레시피 기반 사용량 조회를 위한 개별 요청 (Supabase join 제약 해결)
-  // 실제 서비스라면 RPC를 사용하는 것이 성능상 유리할 수 있음.
-  const inventoryWithRecipes = await Promise.all(data.map(async (stock) => {
-    const { data: recipe } = await supabase
-      .from('customer_recipes')
-      .select('default_use_amount')
-      .eq('customer_id', stock.customer_id)
-      .eq('dye_id', stock.dye_id)
-      .single()
+  // 레시피를 Map으로 변환하여 O(1) 조회
+  const recipeMap = new Map(
+    (recipesResult.data ?? []).map((r) => [
+      `${r.customer_id}:${r.dye_id}`,
+      r.default_use_amount,
+    ])
+  )
 
-    const recipeAmount = recipe?.default_use_amount || 0
-    const remainingUses = recipeAmount > 0 
-      ? Number((stock.current_amount / recipeAmount).toFixed(1)) 
-      : 0
+  return (stocksResult.data ?? []).map((stock) => {
+    const recipeAmount = recipeMap.get(`${stock.customer_id}:${stock.dye_id}`) || 0
+    const remainingUses =
+      recipeAmount > 0
+        ? Number((stock.current_amount / recipeAmount).toFixed(1))
+        : 0
 
     return {
       ...stock,
@@ -40,9 +51,7 @@ export async function getInventory() {
       dye_type: stock.dye_types,
       unit: stock.units,
       recipe_amount: recipeAmount,
-      remaining_uses: remainingUses
+      remaining_uses: remainingUses,
     }
-  }))
-
-  return inventoryWithRecipes
+  })
 }

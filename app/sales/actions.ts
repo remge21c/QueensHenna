@@ -10,10 +10,10 @@ export async function getSalesStats(monthStr?: string) {
   const monthStart = startOfMonth(targetDate).toISOString()
   const monthEnd = endOfMonth(targetDate).toISOString()
 
-  // 1. Fetch all treatments for the month
+  // 1. 필요한 컬럼만 조회 (기존 select('*') → 3개 컬럼)
   const { data: treatments, error } = await supabase
     .from('treatments')
-    .select('*')
+    .select('total_price, payment_method, treated_at')
     .gte('treated_at', monthStart)
     .lte('treated_at', monthEnd)
     .order('treated_at', { ascending: false })
