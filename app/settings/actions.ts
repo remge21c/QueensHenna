@@ -4,8 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 
 export async function getBackupData() {
   const supabase = await createClient()
-  
-  // List of tables to backup
+
   const tables = [
     'customers',
     'reservations',
@@ -15,19 +14,21 @@ export async function getBackupData() {
     'customer_recipes',
     'dye_types',
     'treatment_types',
-    'units'
+    'units',
   ]
 
-  const backup: Record<string, any[]> = {}
+  // 9개 테이블 병렬 조회
+  const results = await Promise.all(
+    tables.map(table => supabase.from(table).select('*'))
+  )
 
-  for (const table of tables) {
-    const { data, error } = await supabase.from(table).select('*')
+  const backup: Record<string, any[]> = {}
+  results.forEach(({ data, error }, i) => {
     if (error) {
-      console.error(`Failed to backup table ${table}:`, error.message)
-      continue
+      console.error(`Failed to backup table ${tables[i]}:`, error.message)
     }
-    backup[table] = data || []
-  }
+    backup[tables[i]] = data || []
+  })
 
   return backup
 }
@@ -55,7 +56,7 @@ export async function restoreData(backup: Record<string, any[]>) {
 
 export async function getTreatmentTypes() {
   const supabase = await createClient()
-  const { data, error } = await supabase.from('treatment_types').select('*').order('name')
+  const { data, error } = await supabase.from('treatment_types').select('id, name, base_price').order('name')
   if (error) throw error
   return data
 }

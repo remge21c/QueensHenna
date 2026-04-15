@@ -96,6 +96,7 @@ export default function TreatmentCompletionForm({
     const res = await completeTreatmentAction(
       treatmentId,
       reservationId,
+      customerId,
       totalPrice,
       paymentMethod,
       memo,

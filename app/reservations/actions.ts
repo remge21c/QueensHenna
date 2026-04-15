@@ -97,8 +97,7 @@ export async function getReservationsByDate(dateString: string) {
   const reservationIds = data.map((r: any) => r.id)
   let treatmentMap: Record<string, string> = {}
   if (reservationIds.length > 0) {
-    const supabase2 = await createClient()
-    const { data: treatments } = await supabase2
+    const { data: treatments } = await supabase
       .from('treatments')
       .select('id, reservation_id')
       .in('reservation_id', reservationIds)

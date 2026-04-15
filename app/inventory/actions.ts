@@ -23,7 +23,7 @@ export async function getUnits() {
   const supabase = await createClient()
   const { data, error } = await supabase
     .from("units")
-    .select("*")
+    .select("id, name")
     .order("name")
   if (error) throw error
   return data
@@ -108,55 +108,52 @@ export async function createBatchDyePurchase(data: {
   const supabase = await createClient()
   const { customer_id, entries, mode = 'add' } = data
 
-  for (const entry of entries) {
-    const { data: existingStock } = await supabase
-      .from("customer_dye_stocks")
-      .select("id, purchased_amount, current_amount")
-      .eq("customer_id", customer_id)
-      .eq("dye_id", entry.dye_id)
-      .maybeSingle()
+  // 기존 재고를 한 번에 일괄 조회
+  const dyeIds = entries.map(e => e.dye_id)
+  const { data: existingStocks } = await supabase
+    .from("customer_dye_stocks")
+    .select("id, dye_id, purchased_amount, current_amount")
+    .eq("customer_id", customer_id)
+    .in("dye_id", dyeIds)
+
+  const stockMap = new Map((existingStocks ?? []).map(s => [s.dye_id, s]))
+  const toInsert: any[] = []
+
+  // 업데이트 병렬 실행
+  await Promise.all(entries.map(entry => {
+    const existing = stockMap.get(entry.dye_id)
 
     if (mode === 'set') {
       const status = entry.amount <= 0 ? '소진' : '정상'
-      if (existingStock) {
-        await supabase
+      if (existing) {
+        return supabase
           .from("customer_dye_stocks")
           .update({ purchased_amount: entry.amount, current_amount: entry.amount, status })
-          .eq("id", existingStock.id)
-      } else {
-        await supabase.from("customer_dye_stocks").insert({
-          customer_id,
-          dye_id: entry.dye_id,
-          unit_id: entry.unit_id,
-          purchased_amount: entry.amount,
-          current_amount: entry.amount,
-          status,
-        })
+          .eq("id", existing.id)
       }
+      toInsert.push({ customer_id, dye_id: entry.dye_id, unit_id: entry.unit_id, purchased_amount: entry.amount, current_amount: entry.amount, status })
+      return Promise.resolve()
     } else {
-      // 'add' mode
-      if (existingStock) {
-        const newAmount = Number(existingStock.current_amount) + Number(entry.amount)
+      if (existing) {
+        const newAmount = Number(existing.current_amount) + Number(entry.amount)
         const status = newAmount <= 0 ? '소진' : '정상'
-        await supabase
+        return supabase
           .from("customer_dye_stocks")
           .update({
-            purchased_amount: Number(existingStock.purchased_amount) + Number(entry.amount),
+            purchased_amount: Number(existing.purchased_amount) + Number(entry.amount),
             current_amount: newAmount,
             status,
           })
-          .eq("id", existingStock.id)
-      } else {
-        await supabase.from("customer_dye_stocks").insert({
-          customer_id,
-          dye_id: entry.dye_id,
-          unit_id: entry.unit_id,
-          purchased_amount: entry.amount,
-          current_amount: entry.amount,
-          status: "정상",
-        })
+          .eq("id", existing.id)
       }
+      toInsert.push({ customer_id, dye_id: entry.dye_id, unit_id: entry.unit_id, purchased_amount: entry.amount, current_amount: entry.amount, status: "정상" })
+      return Promise.resolve()
     }
+  }))
+
+  // 신규 재고 일괄 삽입
+  if (toInsert.length > 0) {
+    await supabase.from("customer_dye_stocks").insert(toInsert)
   }
 
   revalidatePath("/inventory")
@@ -174,45 +171,52 @@ export async function upsertDyeStocksFromSheet(data: {
   const supabase = await createClient()
   const { customer_id, entries, mode = 'add' } = data
 
-  for (const entry of entries) {
-    const { data: existingStock } = await supabase
-      .from("customer_dye_stocks")
-      .select("id, purchased_amount, current_amount")
-      .eq("customer_id", customer_id)
-      .eq("dye_id", entry.dye_id)
-      .maybeSingle()
+  // 기존 재고를 한 번에 일괄 조회
+  const dyeIds = entries.map(e => e.dye_id)
+  const { data: existingStocks } = await supabase
+    .from("customer_dye_stocks")
+    .select("id, dye_id, purchased_amount, current_amount")
+    .eq("customer_id", customer_id)
+    .in("dye_id", dyeIds)
+
+  const stockMap = new Map((existingStocks ?? []).map(s => [s.dye_id, s]))
+  const toInsert: any[] = []
+
+  // 업데이트 병렬 실행
+  await Promise.all(entries.map(entry => {
+    const existing = stockMap.get(entry.dye_id)
 
     if (mode === 'set') {
       const status = entry.amount <= 0 ? '소진' : '정상'
-      if (existingStock) {
-        await supabase
+      if (existing) {
+        return supabase
           .from("customer_dye_stocks")
           .update({ purchased_amount: entry.amount, current_amount: entry.amount, status })
-          .eq("id", existingStock.id)
-      } else {
-        await supabase.from("customer_dye_stocks").insert({
-          customer_id, dye_id: entry.dye_id, unit_id: entry.unit_id,
-          purchased_amount: entry.amount, current_amount: entry.amount, status,
-        })
+          .eq("id", existing.id)
       }
+      toInsert.push({ customer_id, dye_id: entry.dye_id, unit_id: entry.unit_id, purchased_amount: entry.amount, current_amount: entry.amount, status })
+      return Promise.resolve()
     } else {
-      if (existingStock) {
-        const newAmount = Number(existingStock.current_amount) + Number(entry.amount)
+      if (existing) {
+        const newAmount = Number(existing.current_amount) + Number(entry.amount)
         const status = newAmount <= 0 ? '소진' : '정상'
-        await supabase
+        return supabase
           .from("customer_dye_stocks")
           .update({
-            purchased_amount: Number(existingStock.purchased_amount) + Number(entry.amount),
-            current_amount: newAmount, status,
+            purchased_amount: Number(existing.purchased_amount) + Number(entry.amount),
+            current_amount: newAmount,
+            status,
           })
-          .eq("id", existingStock.id)
-      } else {
-        await supabase.from("customer_dye_stocks").insert({
-          customer_id, dye_id: entry.dye_id, unit_id: entry.unit_id,
-          purchased_amount: entry.amount, current_amount: entry.amount, status: "정상",
-        })
+          .eq("id", existing.id)
       }
+      toInsert.push({ customer_id, dye_id: entry.dye_id, unit_id: entry.unit_id, purchased_amount: entry.amount, current_amount: entry.amount, status: "정상" })
+      return Promise.resolve()
     }
+  }))
+
+  // 신규 재고 일괄 삽입
+  if (toInsert.length > 0) {
+    await supabase.from("customer_dye_stocks").insert(toInsert)
   }
 
   revalidatePath("/inventory")
@@ -234,7 +238,7 @@ export async function createDyePurchase(formData: any) {
   // 기성 재고 확인
   const { data: existingStock } = await supabase
     .from("customer_dye_stocks")
-    .select("*")
+    .select("id, purchased_amount, current_amount")
     .eq("customer_id", customer_id)
     .eq("dye_id", dye_id)
     .single()

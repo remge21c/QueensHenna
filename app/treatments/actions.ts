@@ -30,6 +30,7 @@ export async function getTreatments() {
 export async function completeTreatmentAction(
   treatmentId: string,
   reservationId: string | null,
+  customerId: string,
   totalPrice: number,
   paymentMethod: string,
   memo: string,
@@ -42,14 +43,14 @@ export async function completeTreatmentAction(
   if (!treatmentId && reservationId) {
     const { data: reservation } = await supabase
       .from('reservations')
-      .select('customer_id, treatment_type_id, reserved_at')
+      .select('treatment_type_id, reserved_at')
       .eq('id', reservationId)
       .single()
     if (!reservation) return { success: false, error: '예약 정보를 찾을 수 없습니다.' }
     const { data: newTreatment, error: insertError } = await supabase
       .from('treatments')
       .insert({
-        customer_id: reservation.customer_id,
+        customer_id: customerId,
         treatment_type_id: reservation.treatment_type_id,
         reservation_id: reservationId,
         treated_at: reservation.reserved_at,
@@ -70,7 +71,7 @@ export async function completeTreatmentAction(
     if (updateError) return { success: false, error: updateError.message }
   }
 
-  // 2. 사용량 기록
+  // 2. 사용량 기록 + 재고 일괄 조회 (병렬 실행)
   if (usages.length > 0) {
     const usageRows = usages.map(u => ({
       treatment_id: resolvedTreatmentId,
@@ -78,35 +79,31 @@ export async function completeTreatmentAction(
       unit_id: u.unit_id,
       amount: u.amount,
     }))
-    const { error: usageError } = await supabase.from('treatment_usage').insert(usageRows)
-    if (usageError) console.error('treatment_usage insert error:', usageError)
+    const dyeIds = usages.map(u => u.dye_id)
 
-    // 3. 고객 염색약 잔량 차감
-    const { data: treatmentData } = await supabase
-      .from('treatments')
-      .select('customer_id')
-      .eq('id', resolvedTreatmentId)
-      .single()
+    const [, stockResult] = await Promise.all([
+      supabase.from('treatment_usage').insert(usageRows),
+      supabase
+        .from('customer_dye_stocks')
+        .select('id, current_amount, dye_id')
+        .eq('customer_id', customerId)
+        .in('dye_id', dyeIds),
+    ])
 
-    if (treatmentData?.customer_id) {
-      for (const u of usages) {
-        const { data: stock } = await supabase
+    // 3. 고객 염색약 잔량 차감 — 병렬 업데이트
+    const stockMap = new Map((stockResult.data ?? []).map(s => [s.dye_id, s]))
+    await Promise.all(
+      usages.map(u => {
+        const stock = stockMap.get(u.dye_id)
+        if (!stock) return Promise.resolve()
+        const newAmount = Math.max(0, Number(stock.current_amount) - Number(u.amount))
+        const status = newAmount <= 0 ? '소진' : newAmount < 50 ? '주의' : '정상'
+        return supabase
           .from('customer_dye_stocks')
-          .select('id, current_amount')
-          .eq('customer_id', treatmentData.customer_id)
-          .eq('dye_id', u.dye_id)
-          .single()
-
-        if (stock) {
-          const newAmount = Math.max(0, Number(stock.current_amount) - Number(u.amount))
-          const status = newAmount <= 0 ? '소진' : newAmount < 50 ? '주의' : '정상'
-          await supabase
-            .from('customer_dye_stocks')
-            .update({ current_amount: newAmount, status })
-            .eq('id', stock.id)
-        }
-      }
-    }
+          .update({ current_amount: newAmount, status })
+          .eq('id', stock.id)
+      })
+    )
   }
 
   // 4. 예약 상태 → 시술완료
@@ -128,24 +125,24 @@ export async function completeTreatmentAction(
 
 export async function getTreatmentTypes() {
   const supabase = await createClient()
-  const { data, error } = await supabase.from('treatment_types').select('*').order('name')
-  
+  const { data, error } = await supabase.from('treatment_types').select('id, name, base_price').order('name')
+
   if (error) throw new Error(error.message)
   return data
 }
 
 export async function getDyeTypes() {
   const supabase = await createClient()
-  const { data, error } = await supabase.from('dye_types').select('*').order('name')
-  
+  const { data, error } = await supabase.from('dye_types').select('id, name').order('name')
+
   if (error) throw new Error(error.message)
   return data
 }
 
 export async function getUnits() {
   const supabase = await createClient()
-  const { data, error } = await supabase.from('units').select('*').order('name')
-  
+  const { data, error } = await supabase.from('units').select('id, name').order('name')
+
   if (error) throw new Error(error.message)
   return data
 }
@@ -154,13 +151,9 @@ export async function getCustomerDyeStocks(customerId: string) {
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('customer_dye_stocks')
-    .select(`
-      *,
-      dye:dye_types(name),
-      unit:units(name)
-    `)
+    .select('id, dye_id, unit_id, current_amount, status, dye:dye_types(name), unit:units(name)')
     .eq('customer_id', customerId)
-  
+
   if (error) throw new Error(error.message)
   return data
 }
