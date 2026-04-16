@@ -73,23 +73,38 @@ export default function ReservationForm({ initialDate, initialTime, onClose, onS
     }
   }
 
+  // ESC 키로 닫기
+  React.useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    document.addEventListener('keydown', handler)
+    return () => document.removeEventListener('keydown', handler)
+  }, [onClose])
+
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-in fade-in duration-300">
-      <div className="bg-card rounded-xl w-full max-w-lg shadow-2xl overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-10 duration-300">
+    <div
+      className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-in fade-in duration-300"
+      onClick={onClose}
+    >
+      <div
+        className="bg-card rounded-xl w-full max-w-lg shadow-2xl overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-10 duration-300"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
         <div className="bg-primary p-8 text-primary-foreground relative">
           <div className="relative z-10">
             <h2 className="text-2xl font-black tracking-tight">신규 예약 등록</h2>
             <p className="text-primary-foreground/60 text-sm mt-1 font-medium">관리자 전용 예약 등록 시스템</p>
           </div>
+          {/* 장식 원은 X 버튼보다 먼저 렌더링해 클릭 차단 방지 */}
+          <div className="absolute top-0 right-0 w-32 h-32 bg-primary-foreground/5 rounded-full -mr-12 -mt-12 blur-2xl pointer-events-none" />
           <button
             type="button"
             onClick={onClose}
-            className="absolute top-6 right-6 p-2.5 hover:bg-primary-foreground/20 rounded-full transition-all hover:rotate-90"
+            aria-label="닫기"
+            className="absolute top-6 right-6 z-20 p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-primary-foreground/20 rounded-full transition-all hover:rotate-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-foreground"
           >
             <X size={24} weight="bold" />
           </button>
-          <div className="absolute top-0 right-0 w-32 h-32 bg-primary-foreground/5 rounded-full -mr-12 -mt-12 blur-2xl"></div>
         </div>
 
         <form onSubmit={handleSubmit} className="p-8 space-y-6 bg-muted/30 max-h-[70vh] overflow-y-auto">

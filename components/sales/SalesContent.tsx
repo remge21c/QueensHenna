@@ -3,12 +3,11 @@
 import React, { useTransition } from 'react'
 import {
   ChartLineUp,
-  TrendUp,
   CreditCard,
   UserCircleGear,
   DownloadSimple,
   CurrencyKrw,
-  Selection
+  ChartBar,
 } from '@phosphor-icons/react'
 import { useRouter } from 'next/navigation'
 import { format } from 'date-fns'
@@ -45,9 +44,8 @@ export default function SalesContent({ stats, targetMonth }: Props) {
     <div className="animate-in fade-in duration-500">
       <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 md:sticky md:top-0 md:z-20 md:bg-background md:-mx-8 md:px-8 md:pt-8 md:-mt-8">
         <div>
-          <h1 className="text-xl md:text-3xl font-black text-foreground tracking-tight flex items-center gap-2">
+          <h1 className="text-xl md:text-3xl font-black text-foreground tracking-tight">
             매출 통계
-            <span className="text-sm font-medium text-error bg-error-container/30 px-3 py-1 rounded-full uppercase tracking-tighter">Finance Analytics</span>
           </h1>
           <p className="text-muted-foreground mt-1">지점 운영 성과와 매출 추이를 한눈에 확인하세요.</p>
         </div>
@@ -69,66 +67,88 @@ export default function SalesContent({ stats, targetMonth }: Props) {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-10">
         {kpis.map((kpi, idx) => (
           <div key={idx} className="bg-card p-4 md:p-8 rounded-xl border border-border card-shadow relative overflow-hidden group hover:scale-[1.02] transition-transform">
-             <div className="flex justify-between items-start">
-               <div className="z-10">
-                 <p className="text-sm font-bold text-muted-foreground mb-2">{kpi.label}</p>
-                 <p className={`text-2xl font-black font-[family-name:var(--font-numeric)] tabular-nums ${kpi.color}`}>{kpi.value}</p>
-               </div>
-               <div className="p-3 bg-muted rounded-xl text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all">
-                 <kpi.icon size={24} weight="bold" />
-               </div>
-             </div>
-             <div className="mt-4 flex items-center gap-2">
-                <TrendUp className="text-green-500" weight="bold" />
-                <span className="text-[10px] font-black text-green-500 uppercase tracking-widest">Growth detected</span>
-             </div>
+            <div className="flex justify-between items-start gap-2">
+              <div className="z-10 min-w-0 flex-1">
+                <p className="text-xs md:text-sm font-bold text-muted-foreground mb-1 md:mb-2 truncate">{kpi.label}</p>
+                <p className={`text-lg md:text-2xl font-black font-[family-name:var(--font-numeric)] tabular-nums truncate ${kpi.color}`}>{kpi.value}</p>
+              </div>
+              <div className="p-2 md:p-3 bg-muted rounded-xl text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all shrink-0">
+                <kpi.icon size={20} weight="bold" className="md:hidden" />
+                <kpi.icon size={24} weight="bold" className="hidden md:block" />
+              </div>
+            </div>
           </div>
         ))}
       </div>
 
-      {/* Mini Visual Chart (CSS-based) */}
-      <section className="bg-card rounded-xl border border-border p-4 md:p-10 card-shadow mb-10 overflow-hidden relative">
-         <div className="flex justify-between items-center mb-10">
-            <h2 className="text-xl font-black text-foreground flex items-center gap-3">
-              <Selection size={28} weight="fill" className="text-primary" />
-              일자별 매출 추이
-            </h2>
-            <div className="flex items-center gap-6">
-              <div className="flex items-center gap-2">
-                 <div className="w-3 h-3 rounded-full bg-primary" />
-                 <span className="text-xs font-bold text-muted-foreground">카드 결제</span>
-              </div>
-              <div className="flex items-center gap-2">
-                 <div className="w-3 h-3 rounded-full bg-warning" />
-                 <span className="text-xs font-bold text-muted-foreground">현금/기타</span>
-              </div>
+      {/* 일자별 매출 추이 — 수평 바 차트 */}
+      <section className="bg-card rounded-xl border border-border p-4 md:p-10 card-shadow mb-10">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-lg md:text-xl font-black text-foreground flex items-center gap-3">
+            <ChartBar size={24} weight="fill" className="text-primary" />
+            일자별 매출 추이
+          </h2>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-1.5">
+              <div className="w-2.5 h-2.5 rounded-sm bg-primary" />
+              <span className="text-xs font-bold text-muted-foreground">카드</span>
             </div>
-         </div>
-
-         <div className="flex items-end justify-between h-[200px] gap-2 px-4 relative">
-            <div className="absolute inset-0 flex flex-col justify-between pointer-events-none">
-              {[0, 1, 2, 3].map(i => <div key={i} className="border-t border-surface-variant w-full" />)}
+            <div className="flex items-center gap-1.5">
+              <div className="w-2.5 h-2.5 rounded-sm bg-warning" />
+              <span className="text-xs font-bold text-muted-foreground">현금/기타</span>
             </div>
+          </div>
+        </div>
 
-            {stats.dailyBreakdown.slice(0, 15).reverse().map((d: any, i: number) => (
-              <div key={i} className="flex-1 flex flex-col items-center gap-2 relative group z-10">
-                 <div className="w-full flex flex-col-reverse h-[160px] relative">
-                    <div
-                      className="w-full bg-warning rounded-t-lg transition-all duration-1000 origin-bottom"
-                      style={{ height: `${(d.cash / maxTotal) * 100}%` }}
-                    />
-                    <div
-                      className="w-full bg-primary rounded-t-lg mb-[1px] transition-all duration-1000 origin-bottom"
-                      style={{ height: `${(d.card / maxTotal) * 100}%` }}
-                    />
-                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-inverse-surface text-inverse-on-surface text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20">
-                      {d.total.toLocaleString()}원
-                    </div>
-                 </div>
-                 <span className="text-[10px] font-black text-outline-variant uppercase">{format(new Date(d.date), 'dd')}</span>
-              </div>
-            ))}
-         </div>
+        {stats.dailyBreakdown.length === 0 ? (
+          <p className="py-12 text-center text-muted-foreground">해당 월의 매출 데이터가 없습니다.</p>
+        ) : (
+          <div className="flex flex-col gap-3">
+            {stats.dailyBreakdown.map((d: any) => {
+              const cardPct = maxTotal > 0 ? (d.card / maxTotal) * 100 : 0
+              const cashPct = maxTotal > 0 ? (d.cash / maxTotal) * 100 : 0
+              return (
+                <div key={d.date} className="flex items-center gap-3">
+                  {/* 날짜 레이블 */}
+                  <div className="w-10 shrink-0 text-right">
+                    <span className="text-xs font-black text-muted-foreground">
+                      {format(new Date(d.date), 'dd')}
+                    </span>
+                    <span className="block text-[9px] text-outline-variant font-bold">
+                      {format(new Date(d.date), 'E', { locale: ko })}
+                    </span>
+                  </div>
+                  {/* 바 영역 */}
+                  <div className="flex-1 h-7 bg-muted rounded-lg overflow-hidden flex">
+                    {cardPct > 0 && (
+                      <div
+                        className="h-full bg-primary transition-all duration-700 flex items-center justify-end pr-1"
+                        style={{ width: `${cardPct}%` }}
+                      />
+                    )}
+                    {cashPct > 0 && (
+                      <div
+                        className="h-full bg-warning transition-all duration-700"
+                        style={{ width: `${cashPct}%` }}
+                      />
+                    )}
+                    {d.total === 0 && (
+                      <div className="h-full w-full flex items-center pl-3">
+                        <span className="text-[10px] text-muted-foreground">-</span>
+                      </div>
+                    )}
+                  </div>
+                  {/* 금액 */}
+                  <div className="w-20 shrink-0 text-right">
+                    <span className="text-xs font-black text-foreground font-[family-name:var(--font-numeric)] tabular-nums">
+                      {d.total > 0 ? `${(d.total / 1000).toFixed(0)}K` : '-'}
+                    </span>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
       </section>
 
       {/* Detailed Table */}

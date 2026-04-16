@@ -33,12 +33,13 @@ export default async function CustomersPage() {
             <p className="text-sm text-muted-foreground">고객 정보 및 시술 이력 통합 관리</p>
           </div>
         </div>
-        <Link 
+        <Link
           href="/customers/register"
-          className="btn-primary"
+          className="btn-primary shrink-0"
         >
           <UserPlus size={20} weight="bold" />
-          신규 고객 등록
+          <span className="hidden sm:inline">신규 고객 등록</span>
+          <span className="sm:hidden">등록</span>
         </Link>
       </header>
 

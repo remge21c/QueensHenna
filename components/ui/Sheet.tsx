@@ -57,9 +57,10 @@ export default function Sheet({ isOpen, onClose, title, children, width = "max-w
           <div className="flex items-center justify-between px-6 py-4 border-b border-border shrink-0">
             <h2 id={titleId} className="text-lg font-bold text-foreground">{title}</h2>
             <button
+              type="button"
               onClick={onClose}
               aria-label="닫기"
-              className="p-2 rounded-xl hover:bg-muted transition-colors text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl hover:bg-muted transition-colors text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
               <X size={20} weight="bold" aria-hidden="true" />
             </button>

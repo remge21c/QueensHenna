@@ -192,9 +192,22 @@ export default function TreatmentForm({ onSuccess, onCancel }: TreatmentFormProp
     })
   }
 
+  // ESC 키로 닫기
+  React.useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onCancel?.() }
+    document.addEventListener('keydown', handler)
+    return () => document.removeEventListener('keydown', handler)
+  }, [onCancel])
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className="bg-muted w-full max-w-4xl max-h-[90vh] overflow-hidden rounded-xl shadow-2xl flex flex-col border border-border animate-in slide-in-from-bottom-8 duration-500">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300"
+      onClick={onCancel}
+    >
+      <div
+        className="bg-muted w-full max-w-4xl max-h-[90vh] overflow-hidden rounded-xl shadow-2xl flex flex-col border border-border animate-in slide-in-from-bottom-8 duration-500"
+        onClick={(e) => e.stopPropagation()}
+      >
 
         {/* Header */}
         <div className="px-8 py-6 bg-card border-b border-border flex justify-between items-center">
@@ -208,8 +221,10 @@ export default function TreatmentForm({ onSuccess, onCancel }: TreatmentFormProp
             </div>
           </div>
           <button
+            type="button"
             onClick={onCancel}
-            className="p-2 hover:bg-surface-container rounded-full transition-colors text-outline-variant"
+            aria-label="닫기"
+            className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-surface-container rounded-full transition-colors text-outline-variant focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           >
             <X size={24} weight="bold" />
           </button>

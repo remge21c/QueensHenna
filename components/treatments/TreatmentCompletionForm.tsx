@@ -110,9 +110,22 @@ export default function TreatmentCompletionForm({
     setSubmitting(false)
   }
 
+  // ESC 키로 닫기
+  React.useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    document.addEventListener('keydown', handler)
+    return () => document.removeEventListener('keydown', handler)
+  }, [onClose])
+
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-in fade-in duration-300">
-      <div className="bg-card rounded-xl w-full max-w-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+    <div
+      className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-in fade-in duration-300"
+      onClick={onClose}
+    >
+      <div
+        className="bg-card rounded-xl w-full max-w-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* 헤더 */}
         <div className="bg-primary p-6 text-primary-foreground relative flex justify-between items-start">
           <div>
@@ -121,7 +134,12 @@ export default function TreatmentCompletionForm({
               <span className="font-bold">{customerName}</span> 고객 · {treatmentTypeName}
             </p>
           </div>
-          <button type="button" onClick={onClose} className="p-2 hover:bg-primary-foreground/20 rounded-full transition-all">
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="닫기"
+            className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-primary-foreground/20 rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-foreground"
+          >
             <X size={22} weight="bold" />
           </button>
         </div>
