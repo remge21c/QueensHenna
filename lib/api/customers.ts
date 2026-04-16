@@ -11,7 +11,8 @@ export async function getCustomers() {
         id, name, phone, birth_date, memo, created_at, updated_at,
         customer_dye_stocks(
           id, status, current_amount, dye_id,
-          dye_types(name)
+          dye_types(name),
+          units(name)
         )
       `)
       .order('name', { ascending: true }),

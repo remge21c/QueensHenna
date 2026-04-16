@@ -18,33 +18,39 @@ interface Customer {
   customer_dye_stocks?: any[];
 }
 
+function getWorstStatus(stocks: any[]): string {
+  if (!stocks || stocks.length === 0) return "정상"
+  if (stocks.some(s => s.status === "소진")) return "소진"
+  if (stocks.some(s => s.status === "경고")) return "경고"
+  if (stocks.some(s => s.status === "주의")) return "주의"
+  return "정상"
+}
+
+function statusVariant(status: string) {
+  return status === "경고" || status === "소진" ? "danger" : status === "주의" ? "warning" : "success"
+}
+
 function CustomerCard({ customer, onClick }: { customer: Customer; onClick: () => void }) {
-  const primaryStock = customer.customer_dye_stocks?.[0];
-  const dyeName = primaryStock?.dye_types?.name || "기록 없음";
-  const currentAmount = primaryStock?.current_amount || 0;
-  const status = primaryStock?.status || "정상";
+  const stocks = customer.customer_dye_stocks || []
+  const overallStatus = getWorstStatus(stocks)
 
   return (
     <button
       type="button"
       onClick={onClick}
-      className="w-full text-left flex items-center gap-3 px-4 py-4 border-b border-border last:border-0 hover:bg-muted/40 active:bg-muted/60 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+      className="w-full text-left flex items-start gap-3 px-4 py-4 border-b border-border last:border-0 hover:bg-muted/40 active:bg-muted/60 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
     >
-      <Avatar name={customer.name} className="w-10 h-10 shrink-0" />
+      <Avatar name={customer.name} className="w-10 h-10 shrink-0 mt-0.5" />
       <div className="flex-1 min-w-0">
+        {/* 이름 + 전화번호 + 전체 상태 */}
         <div className="flex items-center gap-2">
           <span className="font-bold text-foreground truncate">{customer.name}</span>
-          <Badge
-            variant={
-              status === "경고" || status === "소진" ? "danger" :
-              status === "주의" ? "warning" : "success"
-            }
-          >
-            {status}
-          </Badge>
+          <Badge variant={statusVariant(overallStatus)}>{overallStatus}</Badge>
         </div>
-        <p className="text-sm text-muted-foreground mt-0.5 truncate">{customer.phone}</p>
-        <div className="flex items-center gap-3 mt-1">
+        <p className="text-xs text-muted-foreground mt-0.5 truncate">{customer.phone}</p>
+
+        {/* 방문 정보 */}
+        <div className="flex items-center gap-2 mt-1">
           <span className="text-xs text-muted-foreground">
             {customer.last_visit
               ? formatDistanceToNow(new Date(customer.last_visit), { addSuffix: true, locale: ko })
@@ -52,13 +58,32 @@ function CustomerCard({ customer, onClick }: { customer: Customer; onClick: () =
           </span>
           <span className="text-xs text-muted-foreground">·</span>
           <span className="text-xs text-muted-foreground">{customer.total_visits}회 방문</span>
-          <span className="text-xs text-muted-foreground">·</span>
-          <span className={`text-xs ${status === "경고" || status === "소진" ? "text-danger font-semibold" : "text-muted-foreground"}`}>
-            {dyeName} ({currentAmount}회)
-          </span>
         </div>
+
+        {/* 보유 염색약 전체 목록 */}
+        {stocks.length === 0 ? (
+          <span className="text-xs text-muted-foreground mt-1.5 block">보유 염색약 없음</span>
+        ) : (
+          <div className="flex flex-wrap gap-1.5 mt-2">
+            {stocks.map((s: any) => (
+              <span
+                key={s.id}
+                className={`inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full border ${
+                  s.status === "소진" || s.status === "경고"
+                    ? "border-danger/30 bg-danger/5 text-danger"
+                    : s.status === "주의"
+                    ? "border-warning/30 bg-warning/5 text-warning"
+                    : "border-border bg-muted text-muted-foreground"
+                }`}
+              >
+                {s.dye_types?.name}
+                <span className="opacity-70">{s.current_amount}{s.unit?.name || 'g'}</span>
+              </span>
+            ))}
+          </div>
+        )}
       </div>
-      <CaretRight size={16} className="text-muted-foreground shrink-0" aria-hidden="true" />
+      <CaretRight size={16} className="text-muted-foreground shrink-0 mt-1" aria-hidden="true" />
     </button>
   );
 }
@@ -102,10 +127,8 @@ export default function CustomerTable({ customers }: { customers: Customer[] }) 
           </thead>
           <StaggerTbody fast className="text-sm">
             {customers.map((customer) => {
-              const primaryStock = customer.customer_dye_stocks?.[0];
-              const dyeName = primaryStock?.dye_types?.name || "기록 없음";
-              const currentAmount = primaryStock?.current_amount || 0;
-              const status = primaryStock?.status || "정상";
+              const stocks = customer.customer_dye_stocks || []
+              const overallStatus = getWorstStatus(stocks)
 
               return (
                 <StaggerTr
@@ -113,9 +136,11 @@ export default function CustomerTable({ customers }: { customers: Customer[] }) 
                   className="border-b border-border hover:bg-muted/50 transition-colors cursor-pointer"
                   onClick={() => router.push(`/customers/${customer.id}`)}
                 >
-                  <td className="py-4 px-4 flex items-center gap-3">
-                    <Avatar name={customer.name} className="w-9 h-9" />
-                    <span className="font-bold text-foreground">{customer.name}</span>
+                  <td className="py-4 px-4">
+                    <div className="flex items-center gap-3">
+                      <Avatar name={customer.name} className="w-9 h-9 shrink-0" />
+                      <span className="font-bold text-foreground">{customer.name}</span>
+                    </div>
                   </td>
                   <td className="py-4 px-4 text-muted-foreground">{customer.phone}</td>
                   <td className="py-4 px-4">
@@ -137,19 +162,30 @@ export default function CustomerTable({ customers }: { customers: Customer[] }) 
                   </td>
                   <td className="py-4 px-4 font-medium">{customer.total_visits}회</td>
                   <td className="py-4 px-4">
-                    <span className={status === "경고" || status === "소진" ? "text-danger font-semibold" : ""}>
-                      {dyeName} ({currentAmount}회)
-                    </span>
+                    {stocks.length === 0 ? (
+                      <span className="text-muted-foreground">기록 없음</span>
+                    ) : (
+                      <div className="flex flex-wrap gap-1.5">
+                        {stocks.map((s: any) => (
+                          <span
+                            key={s.id}
+                            className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full border ${
+                              s.status === "소진" || s.status === "경고"
+                                ? "border-danger/30 bg-danger/5 text-danger"
+                                : s.status === "주의"
+                                ? "border-warning/30 bg-warning/5 text-warning"
+                                : "border-border bg-muted text-muted-foreground"
+                            }`}
+                          >
+                            {s.dye_types?.name}
+                            <span className="opacity-70">{s.current_amount}{s.unit?.name || 'g'}</span>
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </td>
                   <td className="py-4 px-4">
-                    <Badge
-                      variant={
-                        status === "경고" || status === "소진" ? "danger" :
-                        status === "주의" ? "warning" : "success"
-                      }
-                    >
-                      {status}
-                    </Badge>
+                    <Badge variant={statusVariant(overallStatus)}>{overallStatus}</Badge>
                   </td>
                 </StaggerTr>
               );
