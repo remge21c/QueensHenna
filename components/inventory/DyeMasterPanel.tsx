@@ -165,131 +165,186 @@ export default function DyeMasterPanel() {
       </div>
 
       {/* 염색약 목록 */}
-      <div className="overflow-x-auto rounded-xl border border-border">
-        <table className="w-full text-sm border-collapse">
-          <thead>
-            <tr className="bg-muted text-muted-foreground text-xs font-bold uppercase tracking-wider border-b border-border">
-              <th className="px-6 py-4 text-left">염색약명</th>
-              <th className="px-6 py-4 text-right">전체 용량</th>
-              <th className="px-6 py-4 text-center">기본 단위</th>
-              <th className="px-6 py-4 text-left">메모</th>
-              <th className="px-6 py-4 text-center">관리</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border/50">
-            {dyeTypes.length === 0 ? (
-              <tr>
-                <td colSpan={5} className="text-center py-16 text-muted-foreground">
-                  <Drop size={32} weight="light" className="mx-auto mb-3 opacity-40" />
-                  등록된 염색약이 없습니다.
-                </td>
-              </tr>
-            ) : (
-              dyeTypes.map((dye) => (
-                <tr key={dye.id} className="hover:bg-muted/30 transition-colors">
-                  <td className="px-6 py-4 font-bold text-foreground">
-                    {editingId === dye.id ? (
-                      <input
-                        type="text"
-                        value={editForm.name}
-                        onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                        className="w-full px-3 py-1.5 border border-primary rounded-lg text-sm outline-none"
-                      />
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-primary/50" />
-                        {dye.name}
+      {dyeTypes.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-16 text-muted-foreground rounded-xl border border-border">
+          <Drop size={32} weight="light" className="mb-3 opacity-40" />
+          <p>등록된 염색약이 없습니다.</p>
+        </div>
+      ) : (
+        <>
+          {/* ── 모바일: 카드 리스트 ─────────────────────── */}
+          <div className="md:hidden flex flex-col divide-y divide-border rounded-xl border border-border overflow-hidden">
+            {dyeTypes.map((dye) => (
+              <div key={dye.id} className="bg-background hover:bg-muted/20 transition-colors">
+                {editingId === dye.id ? (
+                  /* 편집 모드 */
+                  <div className="p-4 flex flex-col gap-3">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">염색약명</label>
+                        <input
+                          type="text"
+                          value={editForm.name}
+                          onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                          className="h-9 px-3 border border-primary rounded-lg text-sm outline-none"
+                        />
                       </div>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 text-right font-medium text-primary">
-                    {editingId === dye.id ? (
-                      <input
-                        type="number"
-                        value={editForm.total_capacity || ""}
-                        onChange={(e) => setEditForm({ ...editForm, total_capacity: Number(e.target.value) })}
-                        className="w-28 px-3 py-1.5 border border-primary rounded-lg text-sm text-right outline-none"
-                      />
-                    ) : (
-                      `${dye.total_capacity.toLocaleString()}`
-                    )}
-                  </td>
-                  <td className="px-6 py-4 text-center text-muted-foreground">
-                    {editingId === dye.id ? (
-                      <select
-                        value={editForm.default_unit_id}
-                        onChange={(e) => setEditForm({ ...editForm, default_unit_id: e.target.value })}
-                        className="px-3 py-1.5 border border-primary rounded-lg text-sm outline-none appearance-none"
-                      >
-                        <option value="">-</option>
-                        {units.map((u) => (
-                          <option key={u.id} value={u.id}>{u.name}</option>
-                        ))}
-                      </select>
-                    ) : (
-                      dye.units?.name || "-"
-                    )}
-                  </td>
-                  <td className="px-6 py-4 text-muted-foreground max-w-[200px] truncate">
-                    {editingId === dye.id ? (
-                      <input
-                        type="text"
-                        value={editForm.memo}
-                        onChange={(e) => setEditForm({ ...editForm, memo: e.target.value })}
-                        className="w-full px-3 py-1.5 border border-primary rounded-lg text-sm outline-none"
-                        placeholder="메모"
-                      />
-                    ) : (
-                      dye.memo || "-"
-                    )}
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex justify-center gap-2">
-                      {editingId === dye.id ? (
-                        <>
-                          <button
-                            onClick={handleUpdate}
-                            disabled={saving}
-                            className="flex items-center gap-1 px-3 py-1.5 bg-primary text-primary-foreground rounded-lg text-xs font-bold hover:bg-primary/90 transition-all disabled:opacity-50"
-                          >
-                            <CheckCircle size={14} weight="fill" />
-                            저장
-                          </button>
-                          <button
-                            onClick={() => setEditingId(null)}
-                            className="flex items-center gap-1 px-3 py-1.5 bg-muted border border-border rounded-lg text-xs font-bold text-muted-foreground hover:text-foreground transition-all"
-                          >
-                            <X size={14} weight="bold" />
-                            취소
-                          </button>
-                        </>
-                      ) : (
-                        <>
-                          <button
-                            onClick={() => startEdit(dye)}
-                            className="flex items-center gap-1 px-3 py-1.5 text-primary border border-primary/20 rounded-lg text-xs font-bold hover:bg-primary/5 transition-all"
-                          >
-                            <PencilSimple size={14} weight="bold" />
-                            수정
-                          </button>
-                          <button
-                            onClick={() => handleDelete(dye.id, dye.name)}
-                            disabled={saving}
-                            className="flex items-center gap-1 px-3 py-1.5 text-destructive border border-destructive/20 rounded-lg text-xs font-bold hover:bg-destructive/5 transition-all disabled:opacity-50"
-                          >
-                            <Trash size={14} weight="bold" />
-                            삭제
-                          </button>
-                        </>
-                      )}
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">전체 용량</label>
+                        <input
+                          type="number"
+                          value={editForm.total_capacity || ""}
+                          onChange={(e) => setEditForm({ ...editForm, total_capacity: Number(e.target.value) })}
+                          className="h-9 px-3 border border-primary rounded-lg text-sm outline-none text-right"
+                        />
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">기본 단위</label>
+                        <select
+                          value={editForm.default_unit_id}
+                          onChange={(e) => setEditForm({ ...editForm, default_unit_id: e.target.value })}
+                          className="h-9 px-3 border border-primary rounded-lg text-sm outline-none appearance-none"
+                        >
+                          <option value="">-</option>
+                          {units.map((u) => <option key={u.id} value={u.id}>{u.name}</option>)}
+                        </select>
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">메모</label>
+                        <input
+                          type="text"
+                          value={editForm.memo}
+                          onChange={(e) => setEditForm({ ...editForm, memo: e.target.value })}
+                          className="h-9 px-3 border border-primary rounded-lg text-sm outline-none"
+                          placeholder="선택 사항"
+                        />
+                      </div>
                     </div>
-                  </td>
+                    <div className="flex gap-2 pt-1">
+                      <button
+                        onClick={handleUpdate}
+                        disabled={saving}
+                        className="flex-1 flex items-center justify-center gap-1 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-bold disabled:opacity-50"
+                      >
+                        <CheckCircle size={15} weight="fill" />저장
+                      </button>
+                      <button
+                        onClick={() => setEditingId(null)}
+                        className="flex-1 flex items-center justify-center gap-1 py-2 bg-muted border border-border rounded-lg text-sm font-bold text-muted-foreground"
+                      >
+                        <X size={15} weight="bold" />취소
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  /* 보기 모드 */
+                  <div className="flex items-center gap-3 px-4 py-3.5">
+                    <div className="w-2 h-2 rounded-full bg-primary/50 shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <div className="font-bold text-foreground text-sm">{dye.name}</div>
+                      <div className="text-xs text-muted-foreground mt-0.5">
+                        {dye.total_capacity.toLocaleString()}{dye.units?.name || ''} · {dye.memo || '메모 없음'}
+                      </div>
+                    </div>
+                    <div className="flex gap-1.5 shrink-0">
+                      <button
+                        onClick={() => startEdit(dye)}
+                        className="p-2 text-primary border border-primary/20 rounded-lg hover:bg-primary/5 transition-all"
+                        aria-label="수정"
+                      >
+                        <PencilSimple size={15} weight="bold" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(dye.id, dye.name)}
+                        disabled={saving}
+                        className="p-2 text-destructive border border-destructive/20 rounded-lg hover:bg-destructive/5 transition-all disabled:opacity-50"
+                        aria-label="삭제"
+                      >
+                        <Trash size={15} weight="bold" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* ── 데스크탑: 테이블 ────────────────────────── */}
+          <div className="hidden md:block overflow-x-auto rounded-xl border border-border">
+            <table className="w-full text-sm border-collapse">
+              <thead>
+                <tr className="bg-muted text-muted-foreground text-xs font-bold uppercase tracking-wider border-b border-border">
+                  <th className="px-6 py-4 text-left">염색약명</th>
+                  <th className="px-6 py-4 text-right">전체 용량</th>
+                  <th className="px-6 py-4 text-center">기본 단위</th>
+                  <th className="px-6 py-4 text-left">메모</th>
+                  <th className="px-6 py-4 text-center">관리</th>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+              </thead>
+              <tbody className="divide-y divide-border/50">
+                {dyeTypes.map((dye) => (
+                  <tr key={dye.id} className="hover:bg-muted/30 transition-colors">
+                    <td className="px-6 py-4 font-bold text-foreground">
+                      {editingId === dye.id ? (
+                        <input type="text" value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })} className="w-full px-3 py-1.5 border border-primary rounded-lg text-sm outline-none" />
+                      ) : (
+                        <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-primary/50" />{dye.name}</div>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 text-right font-medium text-primary">
+                      {editingId === dye.id ? (
+                        <input type="number" value={editForm.total_capacity || ""} onChange={(e) => setEditForm({ ...editForm, total_capacity: Number(e.target.value) })} className="w-28 px-3 py-1.5 border border-primary rounded-lg text-sm text-right outline-none" />
+                      ) : (
+                        `${dye.total_capacity.toLocaleString()}`
+                      )}
+                    </td>
+                    <td className="px-6 py-4 text-center text-muted-foreground">
+                      {editingId === dye.id ? (
+                        <select value={editForm.default_unit_id} onChange={(e) => setEditForm({ ...editForm, default_unit_id: e.target.value })} className="px-3 py-1.5 border border-primary rounded-lg text-sm outline-none appearance-none">
+                          <option value="">-</option>
+                          {units.map((u) => <option key={u.id} value={u.id}>{u.name}</option>)}
+                        </select>
+                      ) : (
+                        dye.units?.name || "-"
+                      )}
+                    </td>
+                    <td className="px-6 py-4 text-muted-foreground max-w-[200px] truncate">
+                      {editingId === dye.id ? (
+                        <input type="text" value={editForm.memo} onChange={(e) => setEditForm({ ...editForm, memo: e.target.value })} className="w-full px-3 py-1.5 border border-primary rounded-lg text-sm outline-none" placeholder="메모" />
+                      ) : (
+                        dye.memo || "-"
+                      )}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex justify-center gap-2">
+                        {editingId === dye.id ? (
+                          <>
+                            <button onClick={handleUpdate} disabled={saving} className="flex items-center gap-1 px-3 py-1.5 bg-primary text-primary-foreground rounded-lg text-xs font-bold hover:bg-primary/90 transition-all disabled:opacity-50">
+                              <CheckCircle size={14} weight="fill" />저장
+                            </button>
+                            <button onClick={() => setEditingId(null)} className="flex items-center gap-1 px-3 py-1.5 bg-muted border border-border rounded-lg text-xs font-bold text-muted-foreground hover:text-foreground transition-all">
+                              <X size={14} weight="bold" />취소
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <button onClick={() => startEdit(dye)} className="flex items-center gap-1 px-3 py-1.5 text-primary border border-primary/20 rounded-lg text-xs font-bold hover:bg-primary/5 transition-all">
+                              <PencilSimple size={14} weight="bold" />수정
+                            </button>
+                            <button onClick={() => handleDelete(dye.id, dye.name)} disabled={saving} className="flex items-center gap-1 px-3 py-1.5 text-destructive border border-destructive/20 rounded-lg text-xs font-bold hover:bg-destructive/5 transition-all disabled:opacity-50">
+                              <Trash size={14} weight="bold" />삭제
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
     </div>
   )
 }

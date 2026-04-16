@@ -117,85 +117,143 @@ export default function DyeUnitPanel() {
       </div>
 
       {/* 단위 목록 */}
-      <div className="overflow-x-auto border border-border rounded-xl">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="bg-muted text-muted-foreground font-bold uppercase tracking-wider text-xs border-b border-border">
-              <th className="px-6 py-4 text-left">단위명</th>
-              <th className="px-6 py-4 text-center">관리</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border/50">
-            {units.length === 0 ? (
-              <tr>
-                <td colSpan={2} className="text-center py-12 text-muted-foreground">
-                  등록된 단위가 없습니다.
-                </td>
-              </tr>
-            ) : (
-              units.map((unit) => (
-                <tr key={unit.id} className="hover:bg-muted/30 transition-colors">
-                  <td className="px-6 py-4 font-bold text-foreground">
-                    {editingUnitId === unit.id ? (
-                      <input
-                        type="text"
-                        value={editingUnitName}
-                        onChange={(e) => setEditingUnitName(e.target.value)}
-                        onKeyDown={(e) => e.key === "Enter" && handleUpdateUnit()}
-                        className="w-32 px-3 py-1.5 border border-primary rounded-lg text-sm outline-none"
-                        autoFocus
-                      />
-                    ) : (
-                      unit.name
-                    )}
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex justify-center gap-2">
-                      {editingUnitId === unit.id ? (
-                        <>
-                          <button
-                            onClick={handleUpdateUnit}
-                            disabled={loading}
-                            className="flex items-center gap-1 px-3 py-1.5 bg-primary text-primary-foreground rounded-lg text-xs font-bold hover:bg-primary/90 transition-all disabled:opacity-50"
-                          >
-                            <CheckCircle size={14} weight="fill" />
-                            저장
-                          </button>
-                          <button
-                            onClick={() => setEditingUnitId(null)}
-                            className="flex items-center gap-1 px-3 py-1.5 bg-muted border border-border rounded-lg text-xs font-bold text-muted-foreground hover:text-foreground transition-all"
-                          >
-                            <X size={14} weight="bold" />
-                            취소
-                          </button>
-                        </>
-                      ) : (
-                        <>
-                          <button
-                            onClick={() => { setEditingUnitId(unit.id); setEditingUnitName(unit.name) }}
-                            className="flex items-center gap-1 px-3 py-1.5 text-primary border border-primary/20 rounded-lg text-xs font-bold hover:bg-primary/5 transition-all"
-                          >
-                            <PencilSimple size={14} weight="bold" />
-                            수정
-                          </button>
-                          <button
-                            onClick={() => handleDeleteUnit(unit.id, unit.name)}
-                            disabled={loading}
-                            className="flex items-center gap-1 px-3 py-1.5 text-danger border border-danger/20 rounded-lg text-xs font-bold hover:bg-danger/5 transition-all disabled:opacity-50"
-                          >
-                            <Trash size={14} weight="bold" />
-                            삭제
-                          </button>
-                        </>
-                      )}
+      {units.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-12 text-muted-foreground rounded-xl border border-border text-sm">
+          등록된 단위가 없습니다.
+        </div>
+      ) : (
+        <>
+          {/* ── 모바일: 카드 리스트 ─────────────────────── */}
+          <div className="md:hidden flex flex-col divide-y divide-border rounded-xl border border-border overflow-hidden">
+            {units.map((unit) => (
+              <div key={unit.id} className="bg-background hover:bg-muted/20 transition-colors">
+                {editingUnitId === unit.id ? (
+                  <div className="flex items-center gap-2 px-4 py-3">
+                    <input
+                      type="text"
+                      value={editingUnitName}
+                      onChange={(e) => setEditingUnitName(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && handleUpdateUnit()}
+                      className="flex-1 h-9 px-3 border border-primary rounded-lg text-sm outline-none"
+                      autoFocus
+                    />
+                    <button
+                      onClick={handleUpdateUnit}
+                      disabled={loading}
+                      className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center bg-primary text-primary-foreground rounded-lg disabled:opacity-50"
+                      aria-label="저장"
+                    >
+                      <CheckCircle size={16} weight="fill" />
+                    </button>
+                    <button
+                      onClick={() => setEditingUnitId(null)}
+                      className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center bg-muted border border-border rounded-lg text-muted-foreground"
+                      aria-label="취소"
+                    >
+                      <X size={16} weight="bold" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-3 px-4 py-3.5">
+                    <div className="w-2 h-2 rounded-full bg-primary/50 shrink-0" />
+                    <span className="flex-1 font-bold text-foreground text-sm">{unit.name}</span>
+                    <div className="flex gap-1.5 shrink-0">
+                      <button
+                        onClick={() => { setEditingUnitId(unit.id); setEditingUnitName(unit.name) }}
+                        className="p-2 text-primary border border-primary/20 rounded-lg hover:bg-primary/5 transition-all"
+                        aria-label="수정"
+                      >
+                        <PencilSimple size={15} weight="bold" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteUnit(unit.id, unit.name)}
+                        disabled={loading}
+                        className="p-2 text-danger border border-danger/20 rounded-lg hover:bg-danger/5 transition-all disabled:opacity-50"
+                        aria-label="삭제"
+                      >
+                        <Trash size={15} weight="bold" />
+                      </button>
                     </div>
-                  </td>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* ── 데스크탑: 테이블 ────────────────────────── */}
+          <div className="hidden md:block overflow-x-auto border border-border rounded-xl">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-muted text-muted-foreground font-bold uppercase tracking-wider text-xs border-b border-border">
+                  <th className="px-6 py-4 text-left">단위명</th>
+                  <th className="px-6 py-4 text-center">관리</th>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+              </thead>
+              <tbody className="divide-y divide-border/50">
+                {units.map((unit) => (
+                  <tr key={unit.id} className="hover:bg-muted/30 transition-colors">
+                    <td className="px-6 py-4 font-bold text-foreground">
+                      {editingUnitId === unit.id ? (
+                        <input
+                          type="text"
+                          value={editingUnitName}
+                          onChange={(e) => setEditingUnitName(e.target.value)}
+                          onKeyDown={(e) => e.key === "Enter" && handleUpdateUnit()}
+                          className="w-32 px-3 py-1.5 border border-primary rounded-lg text-sm outline-none"
+                          autoFocus
+                        />
+                      ) : (
+                        unit.name
+                      )}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex justify-center gap-2">
+                        {editingUnitId === unit.id ? (
+                          <>
+                            <button
+                              onClick={handleUpdateUnit}
+                              disabled={loading}
+                              className="flex items-center gap-1 px-3 py-1.5 bg-primary text-primary-foreground rounded-lg text-xs font-bold hover:bg-primary/90 transition-all disabled:opacity-50"
+                            >
+                              <CheckCircle size={14} weight="fill" />
+                              저장
+                            </button>
+                            <button
+                              onClick={() => setEditingUnitId(null)}
+                              className="flex items-center gap-1 px-3 py-1.5 bg-muted border border-border rounded-lg text-xs font-bold text-muted-foreground hover:text-foreground transition-all"
+                            >
+                              <X size={14} weight="bold" />
+                              취소
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <button
+                              onClick={() => { setEditingUnitId(unit.id); setEditingUnitName(unit.name) }}
+                              className="flex items-center gap-1 px-3 py-1.5 text-primary border border-primary/20 rounded-lg text-xs font-bold hover:bg-primary/5 transition-all"
+                            >
+                              <PencilSimple size={14} weight="bold" />
+                              수정
+                            </button>
+                            <button
+                              onClick={() => handleDeleteUnit(unit.id, unit.name)}
+                              disabled={loading}
+                              className="flex items-center gap-1 px-3 py-1.5 text-danger border border-danger/20 rounded-lg text-xs font-bold hover:bg-danger/5 transition-all disabled:opacity-50"
+                            >
+                              <Trash size={14} weight="bold" />
+                              삭제
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
     </div>
   )
 }
