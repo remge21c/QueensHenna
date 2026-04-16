@@ -153,43 +153,86 @@ export default function SalesContent({ stats, targetMonth }: Props) {
 
       {/* Detailed Table */}
       <section className="bg-card rounded-xl border border-border p-4 md:p-10 card-shadow">
-        <h2 className="text-xl font-black text-foreground mb-8">매출 상세 내역</h2>
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="text-left border-b-2 border-border/50">
-                <th className="pb-6 font-black text-outline-variant text-xs uppercase tracking-widest pl-4">일자</th>
-                <th className="pb-6 font-black text-outline-variant text-xs uppercase tracking-widest text-center">시술건수</th>
-                <th className="pb-6 font-black text-outline-variant text-xs uppercase tracking-widest text-right">카드 결제</th>
-                <th className="pb-6 font-black text-outline-variant text-xs uppercase tracking-widest text-right">현금/계좌</th>
-                <th className="pb-6 font-black text-outline-variant text-xs uppercase tracking-widest text-right pr-4">합계</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border/50">
+        <h2 className="text-xl font-black text-foreground mb-4 md:mb-8">매출 상세 내역</h2>
+
+        {stats.dailyBreakdown.length === 0 ? (
+          <p className="py-16 text-center text-muted-foreground">조회된 매출 기록이 없습니다.</p>
+        ) : (
+          <>
+            {/* ── 모바일: 카드 리스트 ─────────────────────── */}
+            <div className="md:hidden flex flex-col divide-y divide-border/50">
               {stats.dailyBreakdown.map((day: any) => (
-                <tr key={day.date} className="hover:bg-muted/50 transition-colors">
-                  <td className="py-6 pl-4">
-                    <span className="font-black text-foreground">{format(new Date(day.date), 'yyyy.MM.dd')}</span>
-                    <span className="text-xs text-outline-variant ml-2 font-bold">({format(new Date(day.date), 'E', { locale: ko })})</span>
-                  </td>
-                  <td className="py-6 text-center">
-                    <span className="px-3 py-1 bg-surface-variant text-foreground rounded-full text-xs font-black">{day.count}건</span>
-                  </td>
-                  <td className="py-6 text-right font-bold text-primary">{day.card.toLocaleString()}원</td>
-                  <td className="py-6 text-right font-bold text-warning">{day.cash.toLocaleString()}원</td>
-                  <td className="py-6 text-right pr-4">
-                    <span className="font-black text-foreground text-lg">{day.total.toLocaleString()}원</span>
-                  </td>
-                </tr>
+                <div key={day.date} className="py-3 flex items-center gap-3">
+                  {/* 날짜 */}
+                  <div className="w-14 shrink-0">
+                    <div className="text-sm font-black text-foreground">
+                      {format(new Date(day.date), 'MM.dd')}
+                    </div>
+                    <div className="text-[11px] text-muted-foreground font-bold">
+                      {format(new Date(day.date), 'E', { locale: ko })}
+                    </div>
+                  </div>
+                  {/* 건수 */}
+                  <span className="px-2 py-0.5 bg-muted text-foreground rounded-full text-xs font-black shrink-0">
+                    {day.count}건
+                  </span>
+                  {/* 카드 / 현금 */}
+                  <div className="flex-1 min-w-0 flex flex-col gap-0.5">
+                    {day.card > 0 && (
+                      <span className="text-xs font-bold text-primary truncate">
+                        카드 {day.card.toLocaleString()}원
+                      </span>
+                    )}
+                    {day.cash > 0 && (
+                      <span className="text-xs font-bold text-warning truncate">
+                        현금 {day.cash.toLocaleString()}원
+                      </span>
+                    )}
+                  </div>
+                  {/* 합계 */}
+                  <div className="shrink-0 text-right">
+                    <span className="text-sm font-black text-foreground font-[family-name:var(--font-numeric)] tabular-nums">
+                      {(day.total / 1000).toFixed(0)}K
+                    </span>
+                  </div>
+                </div>
               ))}
-              {stats.dailyBreakdown.length === 0 && (
-                <tr>
-                  <td colSpan={5} className="py-20 text-center text-outline-variant">조회된 매출 기록이 없습니다.</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+            </div>
+
+            {/* ── 데스크탑: 테이블 ────────────────────────── */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="text-left border-b-2 border-border/50">
+                    <th className="pb-6 font-black text-outline-variant text-xs uppercase tracking-widest pl-4">일자</th>
+                    <th className="pb-6 font-black text-outline-variant text-xs uppercase tracking-widest text-center">시술건수</th>
+                    <th className="pb-6 font-black text-outline-variant text-xs uppercase tracking-widest text-right">카드 결제</th>
+                    <th className="pb-6 font-black text-outline-variant text-xs uppercase tracking-widest text-right">현금/계좌</th>
+                    <th className="pb-6 font-black text-outline-variant text-xs uppercase tracking-widest text-right pr-4">합계</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border/50">
+                  {stats.dailyBreakdown.map((day: any) => (
+                    <tr key={day.date} className="hover:bg-muted/50 transition-colors">
+                      <td className="py-6 pl-4">
+                        <span className="font-black text-foreground">{format(new Date(day.date), 'yyyy.MM.dd')}</span>
+                        <span className="text-xs text-outline-variant ml-2 font-bold">({format(new Date(day.date), 'E', { locale: ko })})</span>
+                      </td>
+                      <td className="py-6 text-center">
+                        <span className="px-3 py-1 bg-surface-variant text-foreground rounded-full text-xs font-black">{day.count}건</span>
+                      </td>
+                      <td className="py-6 text-right font-bold text-primary">{day.card.toLocaleString()}원</td>
+                      <td className="py-6 text-right font-bold text-warning">{day.cash.toLocaleString()}원</td>
+                      <td className="py-6 text-right pr-4">
+                        <span className="font-black text-foreground text-lg">{day.total.toLocaleString()}원</span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
       </section>
     </div>
   )
