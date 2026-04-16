@@ -203,6 +203,12 @@
   main {
     overscroll-behavior-y: contain;
   }
+  /* 모바일 하단 네비게이션 바 높이(56px) + iOS safe area 여백 확보 */
+  @media (max-width: 767px) {
+    #main-content {
+      padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
+    }
+  }
   html {
     @apply font-sans;
   }
