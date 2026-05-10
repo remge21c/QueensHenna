@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import Sidebar from "@/components/layout/Sidebar";
 import PageTransition from "@/components/layout/PageTransition";
 import BottomNav from "@/components/layout/BottomNav";
+import InstallPrompt from "@/components/layout/InstallPrompt";
 import "./globals.css";
 import { Public_Sans, Montserrat } from "next/font/google";
 import { cn } from "@/lib/utils";
@@ -64,6 +65,7 @@ export default function RootLayout({
             </PageTransition>
           </div>
         </main>
+        <InstallPrompt />
       </body>
     </html>
   );
