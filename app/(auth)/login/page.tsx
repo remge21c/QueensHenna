@@ -24,7 +24,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="h-dvh w-full flex items-center justify-center bg-background relative overflow-hidden">
+    <div className="h-dvh w-full flex items-start sm:items-center justify-center bg-background relative overflow-hidden pt-8 sm:pt-0">
       <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-primary-container/50 rounded-full blur-[120px]" />
       <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-tertiary-container/50 rounded-full blur-[120px]" />
 

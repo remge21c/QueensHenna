@@ -15,7 +15,6 @@ import {
   ChatCircleText,
   ChartLineUp,
   Gear,
-  ShareNetworkIcon,
   X,
 } from '@phosphor-icons/react'
 
@@ -40,15 +39,6 @@ export default function BottomNav() {
 
   const isMoreActive = moreItems.some((item) => pathname === item.href)
 
-  const handleShare = async () => {
-    if (navigator.share) {
-      await navigator.share({
-        title: '퀸즈헤나 CRM',
-        text: '퀸즈헤나 고객관리 시스템',
-        url: window.location.origin,
-      })
-    }
-  }
 
   // ESC 키 및 바깥 클릭으로 닫기
   useEffect(() => {
@@ -129,14 +119,6 @@ export default function BottomNav() {
                   </Link>
                 )
               })}
-              <button
-                onClick={handleShare}
-                aria-label="앱 공유"
-                className="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl transition-colors text-muted-foreground hover:bg-surface-container hover:text-foreground"
-              >
-                <ShareNetworkIcon size={24} weight="regular" aria-hidden="true" />
-                <span className="text-[11px] font-bold">공유</span>
-              </button>
             </nav>
           </motion.div>
         )}

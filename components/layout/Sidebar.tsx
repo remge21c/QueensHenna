@@ -14,6 +14,7 @@ import {
   Gear,
   Plant,
   SignOutIcon,
+  ShareNetworkIcon,
   List,
   X
 } from "@phosphor-icons/react";
@@ -34,6 +35,16 @@ const navItems = [
 export default function Sidebar() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const handleShare = async () => {
+    if (navigator.share) {
+      await navigator.share({
+        title: '퀸즈헤나 CRM',
+        text: '퀸즈헤나 고객관리 시스템',
+        url: window.location.origin,
+      })
+    }
+  }
 
   useEffect(() => {
     if (!mobileOpen) return;
@@ -80,6 +91,15 @@ export default function Sidebar() {
               </li>
             );
           })}
+          <li>
+            <button
+              onClick={handleShare}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all duration-200 text-muted-foreground hover:bg-surface-container hover:text-primary"
+            >
+              <ShareNetworkIcon size={20} weight="regular" />
+              앱 공유
+            </button>
+          </li>
         </ul>
       </nav>
 
