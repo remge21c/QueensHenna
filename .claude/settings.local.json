@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(npx next:*)",
-      "Bash(grep -l \"radius\" node_modules/tw-animate-css/dist/*.css)",
-      "Bash(grep \"radius\" node_modules/tw-animate-css/dist/*.css)"
-    ]
-  }
-}

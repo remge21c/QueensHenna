@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Sidebar from "@/components/layout/Sidebar";
 import PageTransition from "@/components/layout/PageTransition";
 import BottomNav from "@/components/layout/BottomNav";
@@ -12,6 +12,23 @@ const montserrat = Montserrat({ subsets: ["latin"], variable: "--font-numeric", 
 export const metadata: Metadata = {
   title: "퀸즈헤나 고객관리 시스템",
   description: "퀸즈헤나 염색 전문점 고객 및 예약 관리 시스템",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "퀸즈헤나 고객관리 시스템",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#ffffff",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({
