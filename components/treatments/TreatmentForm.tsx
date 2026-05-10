@@ -10,7 +10,7 @@ import {
   User,
   CurrencyKrw,
   CheckCircle,
-  WarningCircle,
+  WarningCircleIcon,
   Faders,
   MagicWand,
   FloppyDisk
@@ -482,7 +482,7 @@ export default function TreatmentForm({ onSuccess, onCancel }: TreatmentFormProp
                 <div className="pt-6">
                   {error && (
                     <div className="mb-4 flex items-center gap-2 p-3 bg-error-container/20 border border-error-container/30 rounded-xl text-error text-xs">
-                      <WarningCircle weight="fill" size={16} />
+                      <WarningCircleIcon weight="fill" size={16} />
                       {error}
                     </div>
                   )}

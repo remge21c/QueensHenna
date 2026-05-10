@@ -13,11 +13,12 @@ import {
   ChartLineUp,
   Gear,
   Plant,
-  SignOut,
+  SignOutIcon,
   List,
   X
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
+import { signOut } from "@/app/(auth)/actions";
 
 const navItems = [
   { name: "대시보드", href: "/", icon: SquaresFour },
@@ -90,13 +91,16 @@ export default function Sidebar() {
         >
           예약 등록
         </Link>
-        <button
-          aria-label="로그아웃"
-          className="flex items-center gap-3 px-4 py-2 text-muted-foreground hover:text-error transition-colors w-full rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-        >
-          <SignOut size={18} aria-hidden="true" />
-          <span className="text-sm font-medium">로그아웃</span>
-        </button>
+        <form action={signOut}>
+          <button
+            type="submit"
+            aria-label="로그아웃"
+            className="flex items-center gap-3 px-4 py-2 text-muted-foreground hover:text-error transition-colors w-full rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          >
+            <SignOutIcon size={18} aria-hidden="true" />
+            <span className="text-sm font-medium">로그아웃</span>
+          </button>
+        </form>
       </div>
     </>
   );

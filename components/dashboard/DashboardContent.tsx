@@ -8,7 +8,7 @@ import {
   UserPlus,
   ClockCounterClockwise,
   CheckCircle,
-  WarningCircle,
+  WarningCircleIcon,
   ChatText,
   PhoneCall,
   CaretRight,
@@ -285,7 +285,7 @@ export default function DashboardContent({ stats }: { stats: any }) {
             className="bg-card rounded-xl border border-border p-8 card-shadow"
           >
             <div className="flex items-center gap-2 mb-6">
-              <WarningCircle size={24} weight="fill" className="text-error" />
+              <WarningCircleIcon size={24} weight="fill" className="text-error" />
               <h2 className="text-lg font-black text-foreground">염색약 소진 임박</h2>
             </div>
             <div className="space-y-4">

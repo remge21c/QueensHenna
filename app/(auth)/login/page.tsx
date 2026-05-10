@@ -3,10 +3,10 @@
 import { useTransition, useState } from "react";
 import { signIn } from "../actions";
 import {
-  EnvelopeSimple,
-  LockSimple,
-  SignIn,
-  WarningCircle
+  EnvelopeSimpleIcon,
+  LockSimpleIcon,
+  SignInIcon,
+  WarningCircleIcon,
 } from "@phosphor-icons/react";
 
 export default function LoginPage() {
@@ -33,7 +33,7 @@ export default function LoginPage() {
 
           <div className="flex flex-col items-center gap-3 text-center">
             <div className="w-16 h-16 rounded-xl bg-primary flex items-center justify-center text-primary-foreground shadow-lg shadow-primary/20">
-              <SignIn size={36} weight="bold" />
+              <SignInIcon size={36} weight="bold" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-foreground">퀸즈헤나 CRM</h1>
@@ -47,7 +47,7 @@ export default function LoginPage() {
                 이메일 주소
               </label>
               <div className="relative group">
-                <EnvelopeSimple className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={20} />
+                <EnvelopeSimpleIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={20} />
                 <input
                   name="email"
                   type="email"
@@ -63,7 +63,7 @@ export default function LoginPage() {
                 비밀번호
               </label>
               <div className="relative group">
-                <LockSimple className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={20} />
+                <LockSimpleIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={20} />
                 <input
                   name="password"
                   type="password"
@@ -76,7 +76,7 @@ export default function LoginPage() {
 
             {error && (
               <div className="flex items-center gap-2 p-3 bg-error-container/20 border border-error-container/30 rounded-lg text-error text-xs animate-in slide-in-from-top-2 duration-300">
-                <WarningCircle weight="fill" size={16} />
+                <WarningCircleIcon weight="fill" size={16} />
                 {error}
               </div>
             )}
@@ -91,7 +91,7 @@ export default function LoginPage() {
               ) : (
                 <>
                   로그인하기
-                  <SignIn size={20} weight="bold" />
+                  <SignInIcon size={20} weight="bold" />
                 </>
               )}
             </button>
