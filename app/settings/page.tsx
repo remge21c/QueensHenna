@@ -134,7 +134,7 @@ export default function SettingsPage() {
           <p className="text-muted-foreground mt-1">시스템 운영에 필요한 데이터와 환경을 관리합니다.</p>
         </div>
         <button
-          onClick={() => signOut()}
+          onClick={async () => { await signOut() }}
           className="flex items-center gap-2 px-6 py-3 bg-error-container/20 text-error rounded-xl font-bold hover:bg-error-container/40 transition-all active:scale-95"
         >
           <SignOut weight="bold" size={20} />
