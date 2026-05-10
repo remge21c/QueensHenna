@@ -129,14 +129,14 @@ export default function CustomerRecipePanel({ customerId }: { customerId: string
           </div>
         ) : (
           rows.map((row, index) => (
-            <div key={index} className={`grid grid-cols-[1fr_100px_80px_36px] gap-2 items-center rounded-lg px-1 py-0.5 ${
+            <div key={index} className={`grid grid-cols-[1fr_68px_52px_36px] sm:grid-cols-[1fr_100px_80px_36px] gap-1.5 sm:gap-2 items-center rounded-lg px-1 py-0.5 ${
               row.amount === 0 ? "bg-warning/5 border border-warning/15" : ""
             }`}>
               {/* 염색약 선택 */}
               <select
                 value={row.dye_id}
                 onChange={(e) => updateRow(index, "dye_id", e.target.value)}
-                className="h-10 px-3 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm appearance-none transition-all"
+                className="min-w-0 h-10 px-2 sm:px-3 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm appearance-none transition-all"
               >
                 <option value="">염색약 선택</option>
                 {dyeTypes.map((d) => (
@@ -149,10 +149,10 @@ export default function CustomerRecipePanel({ customerId }: { customerId: string
                 type="number"
                 value={row.amount || ""}
                 onChange={(e) => updateRow(index, "amount", Number(e.target.value))}
-                placeholder="사용량 입력"
+                placeholder="수량"
                 min={0}
                 step="any"
-                className={`h-10 px-3 bg-background border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm transition-all ${
+                className={`h-10 px-2 sm:px-3 bg-background border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm transition-all ${
                   row.amount === 0 ? "border-warning/40 placeholder:text-warning/60" : "border-border"
                 }`}
               />
@@ -161,7 +161,7 @@ export default function CustomerRecipePanel({ customerId }: { customerId: string
               <select
                 value={row.unit_id}
                 onChange={(e) => updateRow(index, "unit_id", e.target.value)}
-                className="h-10 px-3 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm appearance-none transition-all"
+                className="min-w-0 h-10 px-1 sm:px-3 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm appearance-none transition-all"
               >
                 <option value="">단위</option>
                 {units.map((u) => (
@@ -172,7 +172,7 @@ export default function CustomerRecipePanel({ customerId }: { customerId: string
               {/* 삭제 버튼 */}
               <button
                 onClick={() => removeRow(index)}
-                className="h-10 w-10 flex items-center justify-center rounded-lg border border-border text-muted-foreground hover:text-destructive hover:border-destructive/30 hover:bg-destructive/5 transition-all"
+                className="h-10 w-9 flex items-center justify-center rounded-lg border border-border text-muted-foreground hover:text-destructive hover:border-destructive/30 hover:bg-destructive/5 transition-all shrink-0"
               >
                 <Trash size={16} weight="bold" />
               </button>
