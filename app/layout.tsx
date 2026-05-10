@@ -17,7 +17,12 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "퀸즈헤나 고객관리 시스템",
+    title: "퀸즈헤나",
+  },
+  icons: {
+    apple: [
+      { url: "/icons/icon512_rounded.png", sizes: "512x512", type: "image/png" },
+    ],
   },
   formatDetection: {
     telephone: false,

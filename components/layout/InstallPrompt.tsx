@@ -26,11 +26,10 @@ export default function InstallPrompt() {
     const isIosDevice = /iphone|ipad|ipod/.test(userAgent);
     setIsIOS(isIosDevice);
 
-    // iOS의 경우 설치 안내를 위해 항상 프롬프트를 띄움 (원한다면 localStorage로 한 번만 띄우게 제어 가능)
     if (isIosDevice) {
-      // 너무 자주 뜨는 것을 막으려면 여기에 localStorage 로직 추가
       const hasDismissed = localStorage.getItem("pwa_prompt_dismissed");
-      if (!hasDismissed) setShowPrompt(true);
+      // 3초 딜레이 후 표시 (페이지 로드 직후보다 자연스러운 타이밍)
+      if (!hasDismissed) setTimeout(() => setShowPrompt(true), 3000);
     }
 
     // Android / Chrome (설치 가능 이벤트 발생 시)
