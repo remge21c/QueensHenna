@@ -1,5 +1,8 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { OWNER_ONLY_PATHS, getRoleFromUser } from '@/lib/auth/roles'
+
+const PUBLIC_PATHS = ['/login', '/api/auth/callback', '/confirm']
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({
@@ -29,15 +32,23 @@ export async function updateSession(request: NextRequest) {
     }
   )
 
-  // This will refresh the session if it exists, or clear it if it doesn't.
   const { data: { user } } = await supabase.auth.getUser()
+  const pathname = request.nextUrl.pathname
 
-  // 만약 로그인된 사용자가 없고 현재 /login_page 가 아니라면 리다이렉트
-  // TODO: 실제 구현 시 TRD에 맞춰 /login_page 명칭 수정 가능
-  if (!user && !request.nextUrl.pathname.startsWith('/login')) {
+  if (!user && !PUBLIC_PATHS.some(p => pathname.startsWith(p))) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     return NextResponse.redirect(url)
+  }
+
+  if (user) {
+    const role = getRoleFromUser(user)
+    const isOwnerOnly = OWNER_ONLY_PATHS.some(p => pathname.startsWith(p))
+    if (isOwnerOnly && role !== 'owner') {
+      const url = request.nextUrl.clone()
+      url.pathname = '/'
+      return NextResponse.redirect(url)
+    }
   }
 
   return response

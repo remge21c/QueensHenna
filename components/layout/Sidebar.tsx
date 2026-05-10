@@ -4,37 +4,43 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import {
-  SquaresFour,
-  Users,
-  CalendarCheck,
-  ClipboardText,
-  Drop,
-  ChatCircleText,
-  ChartLineUp,
-  Gear,
-  Plant,
+  SquaresFourIcon,
+  UsersIcon,
+  CalendarCheckIcon,
+  ClipboardTextIcon,
+  DropIcon,
+  ChatCircleTextIcon,
+  ChartLineUpIcon,
+  GearIcon,
+  PlantIcon,
   SignOutIcon,
   ShareNetworkIcon,
-  List,
-  X
+  ListIcon,
+  XIcon,
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { signOut } from "@/app/(auth)/actions";
+import { useRole } from "@/lib/auth/useRole";
 
-const navItems = [
-  { name: "대시보드", href: "/", icon: SquaresFour },
-  { name: "고객관리", href: "/customers", icon: Users },
-  { name: "예약관리", href: "/reservations", icon: CalendarCheck },
-  { name: "시술기록", href: "/treatments", icon: ClipboardText },
-  { name: "염색약관리", href: "/inventory", icon: Drop },
-  { name: "문자발송", href: "/sms", icon: ChatCircleText },
-  { name: "매출통계", href: "/sales", icon: ChartLineUp },
-  { name: "설정 및 백업", href: "/settings", icon: Gear },
+const allNavItems = [
+  { name: "대시보드", href: "/", icon: SquaresFourIcon },
+  { name: "고객관리", href: "/customers", icon: UsersIcon },
+  { name: "예약관리", href: "/reservations", icon: CalendarCheckIcon },
+  { name: "시술기록", href: "/treatments", icon: ClipboardTextIcon },
+  { name: "염색약관리", href: "/inventory", icon: DropIcon },
+  { name: "문자발송", href: "/sms", icon: ChatCircleTextIcon },
+  { name: "매출통계", href: "/sales", icon: ChartLineUpIcon },
+  { name: "설정 및 백업", href: "/settings", icon: GearIcon, ownerOnly: true },
 ];
 
 export default function Sidebar() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { isOwner, loading: roleLoading } = useRole();
+
+  // During load, show all items to avoid flash-of-missing-menu for owners.
+  // Staff will see settings briefly, but middleware blocks /settings access.
+  const navItems = allNavItems.filter((item) => !item.ownerOnly || roleLoading || isOwner);
 
   const handleShare = async () => {
     if (navigator.share) {
@@ -59,7 +65,7 @@ export default function Sidebar() {
     <>
       <div className="flex items-center gap-3 px-2 mb-4 mt-2">
         <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-primary-foreground shadow-sm">
-          <Plant weight="fill" size={22} />
+          <PlantIcon weight="fill" size={22} />
         </div>
         <div>
           <h1 className="text-lg font-black text-primary leading-none tracking-tight">Queens Henna</h1>
@@ -131,7 +137,7 @@ export default function Sidebar() {
       <div className="fixed top-0 left-0 right-0 z-40 flex md:hidden items-center justify-between glass border-b border-border/60 px-4 h-14">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center text-primary-foreground shadow-sm">
-            <Plant weight="fill" size={16} />
+            <PlantIcon weight="fill" size={16} />
           </div>
           <span className="text-sm font-black text-primary">Queens Henna</span>
         </div>
@@ -142,7 +148,7 @@ export default function Sidebar() {
           aria-controls="mobile-sidebar"
           className="p-2 rounded-lg text-foreground hover:bg-surface-container transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
         >
-          {mobileOpen ? <X size={24} weight="bold" aria-hidden="true" /> : <List size={24} weight="bold" aria-hidden="true" />}
+          {mobileOpen ? <XIcon size={24} weight="bold" aria-hidden="true" /> : <ListIcon size={24} weight="bold" aria-hidden="true" />}
         </button>
       </div>
 
@@ -172,7 +178,7 @@ export default function Sidebar() {
           aria-label="메뉴 닫기"
           className="absolute top-4 right-4 p-1 rounded-lg text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
         >
-          <X size={20} weight="bold" aria-hidden="true" />
+          <XIcon size={20} weight="bold" aria-hidden="true" />
         </button>
         {sidebarContent}
       </aside>

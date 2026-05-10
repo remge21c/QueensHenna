@@ -13,7 +13,8 @@ export const config = {
      * - _next/image (이미지 최적화 파일)
      * - favicon.ico (파비콘 파일)
      * - public 폴더 안의 파일들
+     * - api/auth/callback (Supabase 인증 콜백)
      */
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|api/auth/callback|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }

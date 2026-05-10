@@ -1,20 +1,21 @@
 'use client'
 
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import {
-  CalendarStar,
-  CurrencyKrw,
-  ChartBar,
-  UserPlus,
-  ClockCounterClockwise,
-  CheckCircle,
+  CalendarStarIcon,
+  CurrencyKrwIcon,
+  ChartBarIcon,
+  UserPlusIcon,
+  ClockCounterClockwiseIcon,
+  CheckCircleIcon,
   WarningCircleIcon,
-  ChatText,
-  PhoneCall,
-  CaretRight,
-  DotsThreeVertical,
-  CalendarBlank,
-  MegaphoneSimple
+  ChatTextIcon,
+  PhoneCallIcon,
+  CaretRightIcon,
+  DotsThreeVerticalIcon,
+  CalendarBlankIcon,
+  CrownIcon,
+  UserIcon,
 } from '@phosphor-icons/react'
 import Link from 'next/link'
 import { format } from 'date-fns'
@@ -23,6 +24,8 @@ import { useTiltEffect } from '@/hooks/useTiltEffect'
 import { useCountUp } from '@/hooks/useCountUp'
 import { parseKpiValue } from '@/lib/parseKpiValue'
 import { motion } from 'framer-motion'
+import { createClient } from '@/lib/supabase/client'
+import { useRole } from '@/lib/auth/useRole'
 
 interface KpiItem {
   label: string
@@ -102,11 +105,26 @@ function KpiTiltCard({ kpi }: { kpi: KpiItem }) {
 }
 
 export default function DashboardContent({ stats }: { stats: any }) {
+  const { role, isOwner } = useRole()
+  const [email, setEmail] = useState<string>('')
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setEmail(user?.email ?? '')
+    })
+  }, [])
+
+  const emailPrefix = email.split('@')[0] ?? ''
+  const avatarInitial = emailPrefix.charAt(0).toUpperCase()
+  const roleLabel = isOwner ? '원장' : '직원'
+  const accessLabel = isOwner ? 'ADMIN ACCESS' : 'STAFF ACCESS'
+
   const kpis: KpiItem[] = [
-    { label: '이번 달 누적 매출', value: `${stats.monthSales.toLocaleString()}원`, icon: ChartBar, color: 'secondary', variant: 'featured', colSpan: 'col-span-2' },
-    { label: '오늘의 예약', value: `${stats.todayReservationsCount}명`, icon: CalendarStar, color: 'primary' },
-    { label: '오늘 매출', value: `${stats.todaySales.toLocaleString()}원`, icon: CurrencyKrw, color: 'tertiary' },
-    { label: '오늘 신규 고객', value: `${stats.todayNewCustomers}명`, icon: UserPlus, color: 'primary', variant: 'compact', colSpan: 'col-span-2 md:col-span-4' },
+    { label: '이번 달 누적 매출', value: `${stats.monthSales.toLocaleString()}원`, icon: ChartBarIcon, color: 'secondary', variant: 'featured', colSpan: 'col-span-2' },
+    { label: '오늘의 예약', value: `${stats.todayReservationsCount}명`, icon: CalendarStarIcon, color: 'primary' },
+    { label: '오늘 매출', value: `${stats.todaySales.toLocaleString()}원`, icon: CurrencyKrwIcon, color: 'tertiary' },
+    { label: '오늘 신규 고객', value: `${stats.todayNewCustomers}명`, icon: UserPlusIcon, color: 'primary', variant: 'compact', colSpan: 'col-span-2 md:col-span-4' },
   ]
 
   return (
@@ -119,13 +137,21 @@ export default function DashboardContent({ stats }: { stats: any }) {
           </h1>
           <p className="text-muted-foreground mt-1 font-headline">"오늘도 아름다운 변화를 응원합니다."</p>
         </div>
+
+        {/* User badge */}
         <div className="hidden md:flex items-center gap-4 group cursor-pointer hover:bg-card p-2 pr-4 rounded-xl transition-all card-shadow border border-transparent hover:border-border">
           <div className="text-right">
-            <p className="text-sm font-bold text-foreground">이원장</p>
-            <p className="text-[10px] text-outline-variant uppercase tracking-widest font-black">Admin Access</p>
+            <p className="text-sm font-bold text-foreground flex items-center justify-end gap-1">
+              {isOwner
+                ? <CrownIcon size={12} weight="fill" className="text-primary" />
+                : <UserIcon size={12} weight="bold" className="text-muted-foreground" />
+              }
+              {emailPrefix || roleLabel}
+            </p>
+            <p className="text-[10px] text-outline-variant uppercase tracking-widest font-black">{accessLabel}</p>
           </div>
-          <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center text-primary-foreground font-black shadow-lg group-hover:scale-110 transition-transform">
-            원
+          <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center text-primary-foreground font-black shadow-lg group-hover:scale-110 transition-transform text-lg">
+            {avatarInitial || roleLabel.charAt(0)}
           </div>
         </div>
       </header>
@@ -148,11 +174,11 @@ export default function DashboardContent({ stats }: { stats: any }) {
           >
             <div className="flex justify-between items-center mb-8">
               <h2 className="text-xl font-black text-foreground flex items-center gap-3">
-                <ClockCounterClockwise size={28} weight="fill" className="text-primary" />
+                <ClockCounterClockwiseIcon size={28} weight="fill" className="text-primary" />
                 오늘 시술 대기
               </h2>
               <Link href="/reservations" className="text-primary font-bold text-sm flex items-center gap-1 hover:underline">
-                전체보기 <CaretRight weight="bold" />
+                전체보기 <CaretRightIcon weight="bold" />
               </Link>
             </div>
             {stats.reservations.length === 0 ? (
@@ -223,7 +249,7 @@ export default function DashboardContent({ stats }: { stats: any }) {
                             <p className="text-sm text-muted-foreground line-clamp-1 max-w-[200px]">{res.memo || '-'}</p>
                           </td>
                           <td className="py-6 text-right pr-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button aria-label="옵션 메뉴 열기" className="text-muted-foreground hover:text-foreground transition-colors"><DotsThreeVertical size={24} weight="bold" /></button>
+                            <button aria-label="옵션 메뉴 열기" className="text-muted-foreground hover:text-foreground transition-colors"><DotsThreeVerticalIcon size={24} weight="bold" /></button>
                           </td>
                         </tr>
                       ))}
@@ -244,11 +270,11 @@ export default function DashboardContent({ stats }: { stats: any }) {
           >
             <div className="flex justify-between items-center mb-8">
               <h2 className="text-xl font-black text-foreground flex items-center gap-3">
-                <CheckCircle size={28} weight="fill" className="text-primary" />
+                <CheckCircleIcon size={28} weight="fill" className="text-primary" />
                 최근 시술 기록
               </h2>
               <button className="text-primary font-bold text-sm flex items-center gap-1 hover:underline">
-                실시간 기록 보기 <CaretRight weight="bold" />
+                실시간 기록 보기 <CaretRightIcon weight="bold" />
               </button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -258,7 +284,7 @@ export default function DashboardContent({ stats }: { stats: any }) {
                 <div key={rec.id} className="p-6 rounded-xl border border-border hover:border-primary/30 transition-all flex justify-between items-center group">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all">
-                      <ClockCounterClockwise size={20} weight="fill" />
+                      <ClockCounterClockwiseIcon size={20} weight="fill" />
                     </div>
                     <div>
                       <div className="font-black text-foreground">{rec.customers.name} <span className="text-[10px] text-muted-foreground ml-2 font-normal">{format(new Date(rec.treatment_date), 'HH:mm')}</span></div>
@@ -299,8 +325,8 @@ export default function DashboardContent({ stats }: { stats: any }) {
                     </div>
                   </div>
                   <div className="flex gap-1">
-                    <button aria-label="문자 발송" className="p-2 rounded-xl bg-card text-primary hover:bg-primary hover:text-primary-foreground transition-all card-shadow border border-border"><ChatText size={18} weight="fill" /></button>
-                    <button aria-label="전화 연결" className="p-2 rounded-xl bg-card text-primary hover:bg-primary hover:text-primary-foreground transition-all card-shadow border border-border"><PhoneCall size={18} weight="fill" /></button>
+                    <button aria-label="문자 발송" className="p-2 rounded-xl bg-card text-primary hover:bg-primary hover:text-primary-foreground transition-all card-shadow border border-border"><ChatTextIcon size={18} weight="fill" /></button>
+                    <button aria-label="전화 연결" className="p-2 rounded-xl bg-card text-primary hover:bg-primary hover:text-primary-foreground transition-all card-shadow border border-border"><PhoneCallIcon size={18} weight="fill" /></button>
                   </div>
                 </div>
               ))}
@@ -317,7 +343,7 @@ export default function DashboardContent({ stats }: { stats: any }) {
             className="bg-card rounded-xl border border-border p-8 card-shadow"
           >
             <div className="flex items-center gap-2 mb-6">
-              <CalendarBlank size={24} weight="fill" className="text-tertiary" />
+              <CalendarBlankIcon size={24} weight="fill" className="text-tertiary" />
               <h2 className="text-lg font-black text-foreground">재방문 안내 권장</h2>
             </div>
             <div className="p-6 bg-tertiary-container/20 rounded-xl border border-tertiary-container/30">

@@ -2,15 +2,16 @@
 
 import React, { useState, useEffect } from 'react'
 import {
-  Gear,
-  Tag,
-  ChatCircleText,
-  Database,
-  CloudArrowDown,
-  CloudArrowUp,
-  Warning,
-  CheckCircle,
+  GearIcon,
+  TagIcon,
+  ChatCircleTextIcon,
+  DatabaseIcon,
+  CloudArrowDownIcon,
+  CloudArrowUpIcon,
+  WarningIcon,
+  CheckCircleIcon,
   SignOutIcon,
+  UsersIcon,
 } from '@phosphor-icons/react'
 import {
   getBackupData,
@@ -21,11 +22,14 @@ import {
   deleteTreatmentType,
 } from './actions'
 import { signOut } from '@/app/(auth)/actions'
+import { useRole } from '@/lib/auth/useRole'
+import UsersManagementClient from './users/UsersManagementClient'
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState('backup')
   const [loading, setLoading] = useState(false)
   const [status, setStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null)
+  const { isOwner } = useRole()
 
   const [treatmentTypes, setTreatmentTypes] = useState<any[]>([])
   const [editingType, setEditingType] = useState<any>(null)
@@ -126,6 +130,14 @@ export default function SettingsPage() {
     e.target.value = ''
   }
 
+  const tabs = [
+    { id: 'system', name: '시스템 설정', icon: GearIcon },
+    { id: 'pricing', name: '시술 단가 마스터', icon: TagIcon },
+    { id: 'sms', name: '문자 템플릿', icon: ChatCircleTextIcon },
+    { id: 'backup', name: '데이터 백업/복원', icon: DatabaseIcon },
+    ...(isOwner ? [{ id: 'users', name: '사용자 관리', icon: UsersIcon }] : []),
+  ]
+
   return (
     <div className="animate-in fade-in duration-500">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 md:sticky md:top-0 md:z-20 md:bg-background md:-mx-8 md:px-8 md:pt-8 md:-mt-8">
@@ -146,12 +158,7 @@ export default function SettingsPage() {
 
       {/* Tab Navigation */}
       <div className="flex items-center gap-2 border-b border-border mb-8 overflow-x-auto">
-        {[
-          { id: 'system', name: '시스템 설정', icon: Gear },
-          { id: 'pricing', name: '시술 단가 마스터', icon: Tag },
-          { id: 'sms', name: '문자 템플릿', icon: ChatCircleText },
-          { id: 'backup', name: '데이터 백업/복원', icon: Database },
-        ].map((item) => (
+        {tabs.map((item) => (
           <button
             key={item.id}
             onClick={() => setActiveTab(item.id)}
@@ -173,7 +180,7 @@ export default function SettingsPage() {
             <div className="space-y-8 animate-in slide-in-from-right-4 duration-300">
               <div className="border-b border-border/50 pb-6">
                 <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
-                  <Database size={24} weight="fill" className="text-primary" />
+                  <DatabaseIcon size={24} weight="fill" className="text-primary" />
                   데이터 백업 및 복원
                 </h2>
               </div>
@@ -182,7 +189,7 @@ export default function SettingsPage() {
                 <div className={`p-4 rounded-xl flex items-center gap-3 text-sm font-medium ${
                   status.type === 'success' ? 'bg-green-50 text-green-700 border border-green-100' : 'bg-error-container/20 text-error border border-error-container/30'
                 }`}>
-                  {status.type === 'success' ? <CheckCircle weight="fill" size={20} /> : <Warning weight="fill" size={20} />}
+                  {status.type === 'success' ? <CheckCircleIcon weight="fill" size={20} /> : <WarningIcon weight="fill" size={20} />}
                   {status.message}
                 </div>
               )}
@@ -192,7 +199,7 @@ export default function SettingsPage() {
                 <div className="p-8 rounded-xl bg-muted border border-border flex flex-col justify-between hover:border-primary/30 transition-all group">
                   <div>
                     <div className="w-12 h-12 rounded-xl bg-card flex items-center justify-center text-primary mb-4 card-shadow group-hover:scale-110 transition-transform">
-                      <CloudArrowDown size={24} weight="bold" />
+                      <CloudArrowDownIcon size={24} weight="bold" />
                     </div>
                     <h3 className="font-bold text-foreground text-lg mb-2">시스템 수동 백업</h3>
                     <p className="text-sm text-muted-foreground leading-relaxed">
@@ -212,7 +219,7 @@ export default function SettingsPage() {
                 <div className="p-8 rounded-xl bg-card border border-border flex flex-col justify-between hover:border-error/30 transition-all group card-shadow">
                   <div>
                     <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center text-error mb-4 group-hover:scale-110 transition-transform">
-                      <CloudArrowUp size={24} weight="bold" />
+                      <CloudArrowUpIcon size={24} weight="bold" />
                     </div>
                     <h3 className="font-bold text-foreground text-lg mb-2">데이터 복원</h3>
                     <p className="text-sm text-muted-foreground leading-relaxed">
@@ -221,7 +228,7 @@ export default function SettingsPage() {
                   </div>
                   <div className="mt-8">
                     <label className="h-14 bg-error text-error-foreground rounded-xl font-black hover:bg-error/90 transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-2 shadow-lg shadow-error/20">
-                      <CloudArrowUp size={24} weight="bold" />
+                      <CloudArrowUpIcon size={24} weight="bold" />
                       복원 파일 선택
                       <input
                         type="file"
@@ -238,7 +245,7 @@ export default function SettingsPage() {
               {/* Warning Box */}
               <div className="p-6 bg-error-container/10 border border-error-container/30 rounded-xl flex gap-4">
                 <div className="text-error pt-1">
-                  <Warning size={24} weight="fill" />
+                  <WarningIcon size={24} weight="fill" />
                 </div>
                 <div>
                   <h4 className="text-sm font-bold text-error">주의사항</h4>
@@ -256,7 +263,7 @@ export default function SettingsPage() {
             <div className="space-y-8 animate-in slide-in-from-right-4 duration-300">
               <div className="border-b border-border/50 pb-6 flex justify-between items-center">
                 <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
-                  <Tag size={24} weight="fill" className="text-primary" />
+                  <TagIcon size={24} weight="fill" className="text-primary" />
                   시술 단가 마스터 관리
                 </h2>
               </div>
@@ -265,7 +272,7 @@ export default function SettingsPage() {
                 <div className={`p-4 rounded-xl flex items-center gap-3 text-sm font-medium ${
                   status.type === 'success' ? 'bg-green-50 text-green-700 border border-green-100' : 'bg-error-container/20 text-error border border-error-container/30'
                 }`}>
-                  {status.type === 'success' ? <CheckCircle weight="fill" size={20} /> : <Warning weight="fill" size={20} />}
+                  {status.type === 'success' ? <CheckCircleIcon weight="fill" size={20} /> : <WarningIcon weight="fill" size={20} />}
                   {status.message}
                 </div>
               )}
@@ -366,9 +373,13 @@ export default function SettingsPage() {
             </div>
           )}
 
-          {activeTab !== 'backup' && activeTab !== 'pricing' && (
+          {activeTab === 'users' && isOwner && (
+            <UsersManagementClient />
+          )}
+
+          {activeTab !== 'backup' && activeTab !== 'pricing' && activeTab !== 'users' && (
             <div className="h-full flex flex-col items-center justify-center text-outline-variant opacity-50 space-y-4">
-              <Gear size={64} weight="light" />
+              <GearIcon size={64} weight="light" />
               <p className="font-bold">이 메뉴는 준비 중입니다.</p>
             </div>
           )}
