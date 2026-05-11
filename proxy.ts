@@ -14,7 +14,8 @@ export const config = {
      * - favicon.ico (파비콘 파일)
      * - public 폴더 안의 파일들
      * - api/auth/callback (Supabase 인증 콜백)
+     * - api/backup (Vercel Cron + 백업 API, 자체 인증 헤더 사용)
      */
-    '/((?!_next/static|_next/image|favicon.ico|api/auth/callback|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|api/auth/callback|api/backup|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }

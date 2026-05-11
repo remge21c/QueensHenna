@@ -24,6 +24,7 @@ import {
 import { signOut } from '@/app/(auth)/actions'
 import { useRole } from '@/lib/auth/useRole'
 import UsersManagementClient from './users/UsersManagementClient'
+import BackupSettingsCard from './BackupSettingsCard'
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState('backup')
@@ -256,6 +257,9 @@ export default function SettingsPage() {
                   </p>
                 </div>
               </div>
+
+              {/* Google Drive 자동 백업 카드 (owner 전용) */}
+              {isOwner && <BackupSettingsCard />}
             </div>
           )}
 
