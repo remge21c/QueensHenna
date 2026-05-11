@@ -9,14 +9,18 @@ export async function getDashboardStats() {
   const todayEnd = endOfDay(new Date()).toISOString()
   const monthStart = startOfMonth(new Date()).toISOString()
   const monthEnd = endOfMonth(new Date()).toISOString()
+  const tomorrowStart = startOfDay(new Date(new Date().getTime() + 24 * 60 * 60 * 1000)).toISOString()
+  const nextWeekEnd = endOfDay(new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000)).toISOString()
+  const now = new Date().toISOString()
 
-  // 독립적인 7개 쿼리를 Promise.all로 병렬 실행 (기존 직렬 → 병렬)
+  // 독립적인 8개 쿼리를 Promise.all로 병렬 실행
   const [
     { count: todayReservationsCount },
     { data: todayTreatments },
     { data: monthTreatments },
     { count: todayNewCustomers },
     { data: reservations },
+    { data: weeklyReservations },
     { data: recentTreatments },
     { data: lowStockCustomers },
   ] = await Promise.all([
@@ -58,10 +62,20 @@ export async function getDashboardStats() {
       .eq('status', '예약')
       .order('reserved_at', { ascending: true }),
 
-    // 6. 최근 시술 기록 5개
+    // 5-1. 주간 예약 목록
+    supabase
+      .from('reservations')
+      .select('id, reserved_at, status, memo, customers(name, phone)')
+      .gte('reserved_at', tomorrowStart)
+      .lte('reserved_at', nextWeekEnd)
+      .eq('status', '예약')
+      .order('reserved_at', { ascending: true }),
+
+    // 6. 최근 시술 기록 5개 (미래 날짜 제외)
     supabase
       .from('treatments')
       .select('id, treated_at, total_price, payment_method, treatment_types(name), customers(name)')
+      .lte('treated_at', now)
       .order('treated_at', { ascending: false })
       .limit(5),
 
@@ -83,6 +97,10 @@ export async function getDashboardStats() {
     monthSales,
     todayNewCustomers: todayNewCustomers || 0,
     reservations: (reservations || []).map(r => ({
+      ...r,
+      reservation_time: r.reserved_at,
+    })),
+    weeklyReservations: (weeklyReservations || []).map(r => ({
       ...r,
       reservation_time: r.reserved_at,
     })),

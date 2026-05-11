@@ -20,7 +20,6 @@ import {
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { signOut } from "@/app/(auth)/actions";
-import { useRole } from "@/lib/auth/useRole";
 
 const allNavItems = [
   { name: "대시보드", href: "/", icon: SquaresFourIcon },
@@ -33,14 +32,11 @@ const allNavItems = [
   { name: "설정 및 백업", href: "/settings", icon: GearIcon, ownerOnly: true },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ isOwner = false }: { isOwner?: boolean }) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { isOwner, loading: roleLoading } = useRole();
 
-  // During load, show all items to avoid flash-of-missing-menu for owners.
-  // Staff will see settings briefly, but middleware blocks /settings access.
-  const navItems = allNavItems.filter((item) => !item.ownerOnly || roleLoading || isOwner);
+  const navItems = allNavItems.filter((item) => !item.ownerOnly || isOwner);
 
   const handleShare = async () => {
     if (navigator.share) {

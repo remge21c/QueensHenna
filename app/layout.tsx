@@ -6,6 +6,8 @@ import InstallPrompt from "@/components/layout/InstallPrompt";
 import "./globals.css";
 import { Public_Sans, Montserrat } from "next/font/google";
 import { cn } from "@/lib/utils";
+import { createClient } from "@/lib/supabase/server";
+import { getRoleFromUser } from "@/lib/auth/roles";
 
 const publicSans = Public_Sans({ subsets: ["latin"], variable: "--font-headline" });
 const montserrat = Montserrat({ subsets: ["latin"], variable: "--font-numeric", weight: ["400", "700", "800", "900"] });
@@ -37,11 +39,15 @@ export const viewport: Viewport = {
   userScalable: false,
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const isOwner = getRoleFromUser(user) === 'owner';
+
   return (
     <html
       lang="ko"
@@ -61,8 +67,8 @@ export default function RootLayout({
         >
           본문 바로가기
         </a>
-        <Sidebar />
-        <BottomNav />
+        <Sidebar isOwner={isOwner} />
+        <BottomNav isOwner={isOwner} />
         <main id="main-content" className="flex-1 h-screen overflow-y-auto pt-14 md:pt-0 pb-16 md:pb-0">
           <div className="max-w-[1200px] mx-auto px-4 py-4 md:px-8 md:py-8">
             <PageTransition>

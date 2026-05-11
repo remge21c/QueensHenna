@@ -25,18 +25,19 @@ const mainNavItems = [
   { name: '시술', href: '/treatments', icon: ClipboardText },
 ]
 
-const moreItems = [
+const allMoreItems = [
   { name: '염색약관리', href: '/inventory', icon: Drop },
   { name: '문자발송', href: '/sms', icon: ChatCircleText },
   { name: '매출통계', href: '/sales', icon: ChartLineUp },
-  { name: '설정', href: '/settings', icon: Gear },
+  { name: '설정', href: '/settings', icon: Gear, ownerOnly: true },
 ]
 
-export default function BottomNav() {
+export default function BottomNav({ isOwner = false }: { isOwner?: boolean }) {
   const pathname = usePathname()
   const [moreOpen, setMoreOpen] = useState(false)
   const sheetRef = useRef<HTMLDivElement>(null)
 
+  const moreItems = allMoreItems.filter((item) => !item.ownerOnly || isOwner)
   const isMoreActive = moreItems.some((item) => pathname === item.href)
 
 

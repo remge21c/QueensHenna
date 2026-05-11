@@ -175,7 +175,7 @@ export default function DashboardContent({ stats }: { stats: any }) {
             <div className="flex justify-between items-center mb-8">
               <h2 className="text-xl font-black text-foreground flex items-center gap-3">
                 <ClockCounterClockwiseIcon size={28} weight="fill" className="text-primary" />
-                오늘 시술 대기
+                오늘 시술 예약
               </h2>
               <Link href="/reservations" className="text-primary font-bold text-sm flex items-center gap-1 hover:underline">
                 전체보기 <CaretRightIcon weight="bold" />
@@ -258,6 +258,88 @@ export default function DashboardContent({ stats }: { stats: any }) {
                 </div>
               </>
             )}
+
+            {/* Weekly Reservations */}
+            <div className="mt-8 pt-8 border-t border-border">
+              <h3 className="text-lg font-black text-foreground mb-4">주간 시술 예약</h3>
+              {stats.weeklyReservations.length === 0 ? (
+                <p className="py-8 text-center text-muted-foreground font-medium">이번 주 예정된 추가 예약이 없습니다.</p>
+              ) : (
+                <>
+                  {/* 모바일: 주간 예약 리스트 */}
+                  <div className="md:hidden divide-y divide-border/40">
+                    {stats.weeklyReservations.map((res: any) => (
+                      <div key={res.id} className="flex items-center gap-3 py-4">
+                        <div className="w-14 shrink-0 text-center">
+                          <div className="font-black text-primary text-lg leading-none">
+                            {format(new Date(res.reservation_time), 'HH:mm')}
+                          </div>
+                          <div className="text-[10px] text-muted-foreground mt-1">
+                            {format(new Date(res.reservation_time), 'MM/dd (EEE)', { locale: ko })}
+                          </div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-black text-foreground">{res.customers.name}</div>
+                          <div className="text-xs text-muted-foreground truncate">{res.memo || res.customers.phone}</div>
+                        </div>
+                        <span className={`shrink-0 px-3 py-1 rounded-full text-xs font-black ${
+                          res.status === '시술완료' ? 'bg-primary-container text-on-primary-container' :
+                          res.status === '예약' ? 'bg-tertiary-container text-on-tertiary-container' :
+                          res.status === '노쇼' ? 'bg-error-container/30 text-error' : 'bg-surface-container text-muted-foreground'
+                        }`}>
+                          {res.status}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* 데스크탑: 주간 예약 테이블 */}
+                  <div className="hidden md:block overflow-x-auto">
+                    <table className="w-full">
+                      <caption className="sr-only">주간 시술 예약 목록</caption>
+                      <thead>
+                        <tr className="text-left border-b border-border">
+                          <th className="pb-4 font-bold text-muted-foreground text-xs uppercase tracking-widest pl-2">일시</th>
+                          <th className="pb-4 font-bold text-muted-foreground text-xs uppercase tracking-widest">고객 정보</th>
+                          <th className="pb-4 font-bold text-muted-foreground text-xs uppercase tracking-widest text-center">상태</th>
+                          <th className="pb-4 font-bold text-muted-foreground text-xs uppercase tracking-widest">메모</th>
+                          <th className="pb-4 w-10"></th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border/30">
+                        {stats.weeklyReservations.map((res: any) => (
+                          <tr key={res.id} className="group hover:bg-muted/50 transition-colors">
+                            <td className="py-6 pl-2">
+                              <div className="font-black text-primary text-lg">{format(new Date(res.reservation_time), 'HH:mm')}</div>
+                              <div className="text-xs text-muted-foreground">{format(new Date(res.reservation_time), 'MM/dd (EEE)', { locale: ko })}</div>
+                            </td>
+                            <td className="py-6">
+                              <div className="font-black text-foreground">{res.customers.name}</div>
+                              <div className="text-xs text-muted-foreground font-medium">{res.customers.phone}</div>
+                            </td>
+                            <td className="py-6 text-center">
+                              <span className={`px-4 py-1.5 rounded-full text-xs font-black tracking-tight ${
+                                res.status === '시술완료' ? 'bg-primary-container text-on-primary-container' :
+                                res.status === '예약' ? 'bg-tertiary-container text-on-tertiary-container' :
+                                res.status === '노쇼' ? 'bg-error-container/30 text-error' : 'bg-surface-container text-muted-foreground'
+                              }`}>
+                                {res.status}
+                              </span>
+                            </td>
+                            <td className="py-6">
+                              <p className="text-sm text-muted-foreground line-clamp-1 max-w-[200px]">{res.memo || '-'}</p>
+                            </td>
+                            <td className="py-6 text-right pr-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <button aria-label="옵션 메뉴 열기" className="text-muted-foreground hover:text-foreground transition-colors"><DotsThreeVerticalIcon size={24} weight="bold" /></button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
+              )}
+            </div>
           </motion.section>
 
           {/* Recent Records */}
